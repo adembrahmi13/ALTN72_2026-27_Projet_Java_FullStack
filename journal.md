@@ -15,11 +15,11 @@
 - **Prérequis :** Java `À COMPLÉTER` (identique au TP fil rouge), Maven `À COMPLÉTER`, base de données `À COMPLÉTER` (MariaDB par défaut)
 - **Configuration :** variables d'environnement à définir (aucun secret n'est versionné)
 
-  | Variable | Rôle | Exemple de valeur |
-    |---|---|---|
-  | `DB_URL` | URL de connexion à la base | `jdbc:mariadb://localhost:3306/nomdubase` |
-  | `DB_USER` | Utilisateur de la base | `À COMPLÉTER` |
-  | `DB_PASSWORD` | Mot de passe de la base | *(à ne jamais écrire ici)* |
+  | Variable | Rôle | Exemple de valeur                            |
+    |---|---|----------------------------------------------|
+  | `DB_URL` | URL de connexion à la base | `jdbc:mariadb://localhost:3306/guardian.bdd` |
+  | `DB_USER` | Utilisateur de la base | `À COMPLÉTER`                                |
+  | `DB_PASSWORD` | Mot de passe de la base | *(à ne jamais écrire ici)*                   |
 
 - **Initialiser la base :** `db/create.sql` *(ou procédure : `À COMPLÉTER`)*
     - Les dates des données de démonstration sont générées **relativement à l'instant présent** : `À COMPLÉTER (mécanisme retenu)`

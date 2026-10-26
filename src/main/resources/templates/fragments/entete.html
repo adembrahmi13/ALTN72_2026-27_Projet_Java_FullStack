@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="entete" sec:authorize="isAuthenticated()" class="entete-utilisateur">
+    <span>
+        Bonjour <span th:text="${#authentication.principal.prenom}">Prénom</span>
+        (<span th:text="${#authentication.principal.profil.libelle}">Profil</span>)
+    </span>
+    <span>|</span>
+    <form th:action="@{/deconnexion}" method="post" class="formulaire-deconnexion">
+        <button type="submit" class="lien">Déconnectez-vous</button>
+    </form>
+</header>
+</body>
+</html>
