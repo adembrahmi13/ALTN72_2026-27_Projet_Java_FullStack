@@ -6,6 +6,17 @@ CREATE TABLE station (
                         nom VARCHAR(100) NOT NULL
 );
 
+USE guardian_bdd;
+
+DROP TABLE IF EXISTS evaluation;
+DROP TABLE IF EXISTS incident;
+DROP TABLE IF EXISTS prestataire;
+DROP TABLE IF EXISTS equipement;
+DROP TABLE IF EXISTS station;
+DROP TABLE IF EXISTS utilisateur;
+
+
+
 CREATE TABLE equipement (
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             reference_unique VARCHAR(50) NOT NULL UNIQUE,
@@ -74,8 +85,3 @@ INSERT INTO incident (equipement_id, description, date_heure_ouverture, statut, 
 -- 5. Insertion dans la table evaluation
 INSERT INTO evaluation (incident_id, note, commentaire, date) VALUES
     (1, 5, 'Intervention rapide et efficace.', '2026-06-01');
-
--- 6. Insertion dans la table utilisateur
-INSERT INTO utilisateur (identifiant_connexion, mot_de_passe, prenom, profil) VALUES
-                                                                                  ('admin_jean', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHe...', 'Jean', 'Administrateur'),
-                                                                                  ('tech_marie', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye...', 'Marie', 'Technicien');

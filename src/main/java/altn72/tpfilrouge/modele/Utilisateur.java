@@ -1,53 +1,48 @@
 package altn72.tpfilrouge.modele;
+
 import jakarta.persistence.*;
+import org.jspecify.annotations.Nullable;
 
 @Entity
-@Table(name = "utilisateur")
 public class Utilisateur {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "identifiant_connexion", nullable = false)
-    private String identifiant_connexion;
+    @Column(name = "identifiant_connexion", length = 50)
+    private String login;
 
-    @Column(name = "mot_de_passe", nullable = false, length = 100)
-    private String motDePasse;
+    @Column(name = "mot_de_passe", nullable = false)
+    private String motDePasseHache;
 
-    @Column(name = "prenom", nullable = false, length = 100)
+    @Column(nullable = false, length = 50)
     private String prenom;
 
-    @Column(name = "profil", nullable = false, length = 100)
-    private String profil;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 50)
+    private Profil profil;
 
-    public String getIdentifiantConnexion() {
-        return identifiant_connexion;
+    protected Utilisateur() {
     }
 
-    public void setIdentifiant_connexion(String identifiant_connexion) {
-        this.identifiant_connexion = identifiant_connexion;
+    public Utilisateur(String login, String motDePasseHache, String prenom, Profil profil) {
+        this.login = login;
+        this.motDePasseHache = motDePasseHache;
+        this.prenom = prenom;
+        this.profil = profil;
     }
 
-    public String getMotDePasse() {
-        return motDePasse;
+    public String getLogin() {
+        return login;
     }
 
-    public void setMotDePasse(String motDePasse) {
-        this.motDePasse = motDePasse;
+    public @Nullable String getMotDePasseHache() {
+        return motDePasseHache;
     }
 
     public String getPrenom() {
         return prenom;
     }
 
-    public void setPrenom(String prenom) {
-        this.prenom = prenom;
-    }
-
-    public String getProfil() {
+    public Profil getProfil() {
         return profil;
     }
-
-    public void setProfil(String profil) {
-        this.profil = profil;
-    }
-
 }
