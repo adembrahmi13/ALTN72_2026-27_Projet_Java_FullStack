@@ -23,6 +23,16 @@
 
 - **Initialiser la base :** `db/create.sql` _(ou procédure : `À COMPLÉTER`)_
   - Les dates des données de démonstration sont générées **relativement à l'instant présent** : `À COMPLÉTER (mécanisme retenu)`
+
+  | Variable | Rôle | Exemple de valeur                            |
+    |---|---|----------------------------------------------|
+  | `DB_URL` | URL de connexion à la base | `jdbc:mariadb://localhost:3306/guardian.bdd` |
+  | `DB_USER` | Utilisateur de la base | `À COMPLÉTER`                                |
+  | `DB_PASSWORD` | Mot de passe de la base | *(à ne jamais écrire ici)*                   |
+
+- **Initialiser la base :** `db/create.sql` *(ou procédure : `À COMPLÉTER`)*
+    - Les dates des données de démonstration sont générées **relativement à l'instant présent** : `À COMPLÉTER (mécanisme retenu)`
+
 - **Lancer :** `mvn spring-boot:run`
 - **Lancer les tests :** `mvn verify`
 - **Application déployée :** https://`À COMPLÉTER`
