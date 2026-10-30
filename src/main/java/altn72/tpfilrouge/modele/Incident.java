@@ -8,12 +8,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "incident")
 public class Incident {
+    public static final String STATUT_NON_AFFECTE = "Non affecté";
+
     // Pour dire a JPA que l'attribut id est la clé primaire et qu'il est auto-incrémenté
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +24,7 @@ public class Incident {
     @ManyToOne
     @JoinColumn(name = "equipement_id", nullable = false)
     private Equipement equipement;
+    @NotBlank(message = "La description de l'incident est obligatoire.")
     private String description;
     @Column(name = "date_heure_ouverture", nullable = false)
     private LocalDateTime dateHeureOuverture;
