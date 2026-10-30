@@ -4,6 +4,11 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <header th:fragment="entete" sec:authorize="isAuthenticated()" class="entete-utilisateur">
+    <a class="marque" th:href="@{/accueil}" aria-label="Guardian, accueil"><span class="marque-symbole" aria-hidden="true">G</span> Guardian</a>
+    <nav aria-label="Navigation principale">
+        <a th:href="@{/accueil}">Accueil</a>
+        <a th:href="@{/stations}">Stations et équipements</a>
+    </nav>
     <span>
         Bonjour <span th:text="${#authentication.principal.prenom}">Prénom</span>
         (<span th:text="${#authentication.principal.profil.libelle}">Profil</span>)

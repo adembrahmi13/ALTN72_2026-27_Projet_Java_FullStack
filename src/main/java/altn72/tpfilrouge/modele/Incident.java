@@ -31,6 +31,10 @@ public class Incident {
     private String statut;
     @Column(name = "prestataire_id")
     private Integer prestataireId;
+    // Relation en lecture seule : conserve la compatibilité du champ prestataireId utilisé par F4.
+    @ManyToOne
+    @JoinColumn(name = "prestataire_id", insertable = false, updatable = false)
+    private Prestataire prestataire;
     @Column(name = "date_heure_resolution")
     private LocalDateTime dateHeureResolution;
 
@@ -71,6 +75,10 @@ public class Incident {
 
     public Integer getPrestataireId() {
         return prestataireId;
+    }
+
+    public Prestataire getPrestataire() {
+        return prestataire;
     }
 
     public LocalDateTime getDateHeureResolution() {
