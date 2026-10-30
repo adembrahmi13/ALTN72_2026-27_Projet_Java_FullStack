@@ -28,6 +28,7 @@
     </dl>
 
     <h2>Incidents</h2>
+    <p><a th:href="@{/equipements/{id}/incidents/nouveau(id=${equipement.id})}">Déclarer un incident</a></p>
     <table th:unless="${#lists.isEmpty(incidents)}">
         <thead>
         <tr>
