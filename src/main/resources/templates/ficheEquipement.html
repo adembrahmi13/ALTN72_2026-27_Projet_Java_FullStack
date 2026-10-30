@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fiche équipement</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+
+<main>
+    <p>
+        <a th:href="@{/stations/{id}/equipements(id=${equipement.station.id})}">
+            ← Équipements de <span th:text="${equipement.station.nom}">la station</span>
+        </a>
+    </p>
+    <h1>Équipement <span th:text="${equipement.referenceUnique}">Référence</span></h1>
+
+    <dl>
+        <dt>Libellé</dt>
+        <dd th:text="${equipement.libelleDescription}"></dd>
+        <dt>Type</dt>
+        <dd th:text="${equipement.type}"></dd>
+        <dt>Station</dt>
+        <dd th:text="${equipement.station.nom}"></dd>
+        <dt>État de fonctionnement</dt>
+        <dd th:text="${equipement.etatFonctionnement}"></dd>
+    </dl>
+
+    <h2>Incidents</h2>
+    <table th:unless="${#lists.isEmpty(incidents)}">
+        <thead>
+        <tr>
+            <th scope="col">Ouverture</th>
+            <th scope="col">Description</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Résolution</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="incident : ${incidents}">
+            <td th:text="${#temporals.format(incident.dateHeureOuverture, 'dd/MM/yyyy HH:mm')}"></td>
+            <td th:text="${incident.description}"></td>
+            <td th:text="${incident.statut}"></td>
+            <td th:text="${incident.dateHeureResolution} ? ${#temporals.format(incident.dateHeureResolution, 'dd/MM/yyyy HH:mm')} : '—'"></td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${#lists.isEmpty(incidents)}">Aucun incident pour cet équipement.</p>
+</main>
+</body>
+</html>
