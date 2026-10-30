@@ -2,6 +2,7 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Stations</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -9,8 +10,10 @@
 <div th:replace="~{fragments/entete :: entete}"></div>
 
 <main>
+    <p class="surtitre">Le réseau</p>
     <h1>Stations du réseau</h1>
-    <ul>
+    <p class="introduction">Sélectionnez une station pour retrouver ses équipements et suivre leurs incidents.</p>
+    <ul class="liste-stations">
         <li th:each="station : ${stations}">
             <a th:href="@{/stations/{id}/equipements(id=${station.id})}" th:text="${station.nom}">Station</a>
         </li>

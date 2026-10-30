@@ -2,16 +2,18 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Accueil</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main class="accueil">
+    <p class="surtitre">Votre espace de supervision</p>
     <h1>Supervision des équipements</h1>
-    <p>Bienvenue. Le tableau de bord arrivera avec la fonctionnalité F11.</p>
-    <p><a th:href="@{/stations}">Consulter les équipements par station</a></p>
+    <p>Retrouvez les équipements de votre réseau et consultez le détail des incidents pour suivre leur prise en charge.</p>
+    <p><a class="bouton" th:href="@{/stations}">Consulter les équipements par station</a></p>
 </main>
 </body>
 </html>

@@ -31,6 +31,14 @@ public class IncidentController {
         return VUE_NOUVEL_INCIDENT;
     }
 
+    @GetMapping("/incidents/{id}")
+    public String consulterIncident(@PathVariable Integer id, Model model) {
+        var detail = incidentService.consulterDetail(id);
+        model.addAttribute("detail", detail);
+        model.addAttribute("incident", detail.incident());
+        return "detailIncident";
+    }
+
     @PostMapping("/equipements/{equipementId}/incidents")
     public String declarerIncident(@PathVariable Integer equipementId,
                                    @Valid @ModelAttribute("nouvelIncident") Incident nouvelIncident,

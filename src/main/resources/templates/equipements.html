@@ -2,6 +2,7 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Équipements de la station</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
@@ -12,7 +13,7 @@
     <p><a th:href="@{/stations}">← Toutes les stations</a></p>
     <h1>Équipements — <span th:text="${station.nom}">Station</span></h1>
 
-    <table th:unless="${#lists.isEmpty(equipements)}">
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant" th:unless="${#lists.isEmpty(equipements)}"><table>
         <thead>
         <tr>
             <th scope="col">Référence</th>
@@ -29,7 +30,7 @@
             <td th:text="${equipement.etatFonctionnement}"></td>
         </tr>
         </tbody>
-    </table>
+    </table></div>
     <p th:if="${#lists.isEmpty(equipements)}">Aucun équipement dans cette station.</p>
 </main>
 </body>

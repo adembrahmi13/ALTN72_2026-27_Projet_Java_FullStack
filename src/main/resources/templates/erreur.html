@@ -2,16 +2,19 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Erreur</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main class="carte-erreur">
+    <p class="surtitre">Un problème est survenu</p>
+    <span class="icone-erreur" aria-hidden="true">!</span>
     <h1>Une erreur est survenue</h1>
     <p class="message-erreur" th:text="${message}">Message d'erreur</p>
-    <p><a th:href="@{/accueil}">Retour à l'accueil</a></p>
+    <p><a class="bouton" th:href="@{/accueil}">Retour à l'accueil</a></p>
 </main>
 </body>
 </html>
