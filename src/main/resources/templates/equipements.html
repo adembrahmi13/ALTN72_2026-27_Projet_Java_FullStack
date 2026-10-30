@@ -23,7 +23,7 @@
         </thead>
         <tbody>
         <tr th:each="equipement : ${equipements}">
-            <td th:text="${equipement.referenceUnique}"></td>
+            <td><a th:href="@{/equipements/{id}(id=${equipement.id})}" th:text="${equipement.referenceUnique}">Référence</a></td>
             <td th:text="${equipement.libelleDescription}"></td>
             <td th:text="${equipement.type}"></td>
             <td th:text="${equipement.etatFonctionnement}"></td>

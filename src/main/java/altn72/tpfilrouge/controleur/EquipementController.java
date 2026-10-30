@@ -31,4 +31,11 @@ public class EquipementController {
         return "equipements";
     }
 
+    @GetMapping("/equipements/{equipementId}")
+    public String afficherFicheEquipement(@PathVariable Integer equipementId, Model model) {
+        model.addAttribute("equipement", equipementService.trouverEquipement(equipementId));
+        model.addAttribute("incidents", equipementService.listerIncidents(equipementId));
+        return "ficheEquipement";
+    }
+
 }
