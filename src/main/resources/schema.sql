@@ -1,11 +1,5 @@
 CREATE DATABASE IF NOT EXISTS guardian_bdd CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-CREATE TABLE station (
-
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        nom VARCHAR(100) NOT NULL
-);
-
 USE guardian_bdd;
 
 DROP TABLE IF EXISTS evaluation;
@@ -14,6 +8,11 @@ DROP TABLE IF EXISTS prestataire;
 DROP TABLE IF EXISTS equipement;
 DROP TABLE IF EXISTS station;
 DROP TABLE IF EXISTS utilisateur;
+
+CREATE TABLE station (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL
+);
 
 
 
@@ -47,7 +46,7 @@ CREATE TABLE incident (
 
 CREATE TABLE evaluation (
                             id INT AUTO_INCREMENT PRIMARY KEY,
-                            incident_id INT NOT NULL,
+                            incident_id INT NOT NULL UNIQUE,
                             note INT NOT NULL,
                             commentaire TEXT,
                             date DATE NOT NULL,

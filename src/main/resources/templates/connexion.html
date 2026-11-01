@@ -2,12 +2,15 @@
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Connexion</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
-<body>
+<body class="page-connexion">
 <main class="carte-connexion">
+    <p class="surtitre">Guardian · Supervision du réseau</p>
     <h1>Connexion</h1>
+    <p class="introduction">Retrouvez votre espace de suivi des équipements.</p>
 
     <p th:if="${param.erreur}" class="message-erreur">
         Identifiant ou mot de passe incorrect.
@@ -18,10 +21,10 @@
 
     <form th:action="@{/connexion}" method="post">
         <label for="login">Identifiant</label>
-        <input type="text" id="login" name="login" required autofocus>
+        <input type="text" id="login" name="login" autocomplete="username" required autofocus>
 
         <label for="motDePasse">Mot de passe</label>
-        <input type="password" id="motDePasse" name="motDePasse" required>
+        <input type="password" id="motDePasse" name="motDePasse" autocomplete="current-password" required>
 
         <button type="submit">Se connecter</button>
     </form>
