@@ -2,7 +2,8 @@ package altn72.tpfilrouge.configuration;
 
 import altn72.tpfilrouge.modele.Profil;
 import altn72.tpfilrouge.modele.Utilisateur;
-import altn72.tpfilrouge.modele.UtilisateurRepository;
+import altn72.tpfilrouge.repository.UtilisateurRepository;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

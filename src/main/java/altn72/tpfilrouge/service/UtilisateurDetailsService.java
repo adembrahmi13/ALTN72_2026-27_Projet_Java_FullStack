@@ -1,10 +1,11 @@
 package altn72.tpfilrouge.service;
 
-import altn72.tpfilrouge.modele.UtilisateurRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import altn72.tpfilrouge.repository.UtilisateurRepository;
 
 @Service
 public class UtilisateurDetailsService implements UserDetailsService {
