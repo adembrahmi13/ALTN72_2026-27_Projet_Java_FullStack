@@ -83,7 +83,15 @@ public class IncidentController {
         model.addAttribute("detail", detail);
         model.addAttribute("incident", detail.incident());
         model.addAttribute("modificationAutorisee", droitsIncident.peutModifier(detail.incident()));
+        model.addAttribute("resolutionAutorisee", droitsIncident.peutResoudre(detail.incident()));
         return "detailIncident";
+    }
+
+    @PostMapping("/incidents/{id}/resoudre")
+    public String resoudreIncident(@PathVariable Integer id, RedirectAttributes redirection) {
+        incidentService.resoudreIncident(id);
+        redirection.addFlashAttribute("messageSucces", "L'incident a été déclaré résolu.");
+        return "redirect:/incidents/" + id;
     }
 
     @PostMapping("/equipements/{equipementId}/incidents")

@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F7 à F12 et les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F7 et F9 à F12 ainsi que les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -122,7 +122,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Validation antérieure après refonte HTML/CSS :** 16 tests, aucun échec ni erreur. F6 ajoute 13 tests dédiés, soit 29 tests au total.
+- **Dernière validation :** `mvn verify` réussi ; 16 tests pour F1 à F5, 13 tests F6 et 10 tests F8, soit 39 tests, sans échec ni erreur.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -136,6 +136,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F4 | Création avec valeurs imposées, description vide refusée, équipement absent en 404 | `DeclarationIncidentTest` | 3 |
 | F5 | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement | `DetailIncidentTest` | 6 |
 | F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
+| F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -147,11 +148,11 @@ et les durées exactes en jours, heures et minutes.
 | --- | --- |
 | Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
 | Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
-| Affectation, réaffectation et résolution (RG5–RG6) | F7 et F8 non réalisées |
+| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F8 réalisée et testée ; F7 et F11 restent à réaliser |
 | Historique global trié par résolution (RG7) | F9 non réalisée ; tri par ouverture d'équipement testé |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions des futures fonctions F7–F11 (RG11) | Restrictions F6 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
+| Restrictions des futures fonctions F7, F10 et F11 (RG11) | Restrictions F6 et F8 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
 | API incidents, import/export et agrégations graphiques | Fonctionnalités absentes |
 | Script SQL MariaDB | Tests sur H2 uniquement |
 | Aspect visuel et comportement mobile réels | Pas de test navigateur ni de capture visuelle effectués |
@@ -189,7 +190,8 @@ fournit les rôles. `@EnableMethodSecurity` active `@PreAuthorize` sur les méth
 de préparation et d'enregistrement F6 : seuls les deux profils métier y accèdent.
 `DroitsIncident` contrôle les champs autorisés à partir du contexte de sécurité,
 sans accepter de profil transmis par le formulaire. Ces règles sont utilisées par
-le service et l'interface. Les restrictions F7–F11 restent à appliquer à leurs futures routes.
+le service et l'interface. F8 est également protégée au service ; les restrictions
+F7, F10 et F11 restent à appliquer à leurs futures routes.
 
 ### Modification des informations autorisées — F6
 
@@ -210,7 +212,7 @@ L'action Annuler revient au détail sans enregistrer.
 
 Le responsable dispose de tous les droits métier prévus au tableau, mais reste
 soumis aux règles de cohérence : F6 ne permet pas de réécrire un incident clôturé.
-Les opérations futures F7, F8 et F10 ne sont pas ajoutées par ce formulaire.
+Les opérations F7, F8 et F10 restent distinctes de ce formulaire.
 Le modèle actuel ne mémorise pas l'auteur du signalement : les droits sont donc
 définis par profil et état, sans restriction « uniquement ses propres incidents ».
 
@@ -226,6 +228,33 @@ rattachement sont enregistrés ensemble après validation. Un changement d'équi
 interdit renvoie 403 ; une tentative sur un incident résolu renvoie 409 ; une
 ressource absente renvoie 404. Les tests contrôlent aussi l'absence de modifications
 partielles après refus. Les formulaires conservent la protection CSRF.
+
+### Résolution d'un incident — F8
+
+Le responsable dispose du bouton « Déclarer l'incident comme résolu » sur le détail
+d'un incident ouvert. Un texte précise que la clôture rend le signalement non
+modifiable. Le formulaire POST vers `/incidents/{id}/resoudre` utilise le jeton
+CSRF Thymeleaf. Après succès, le détail affiche un message de confirmation, le statut
+« Résolu » et la date/heure ; les actions modifier et résoudre disparaissent.
+
+`IncidentService.resoudreIncident` est protégé par
+`@PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")` : une requête directe ou un
+appel du service par l'agent est refusé en 403. L'heure provient exclusivement de
+`LocalDateTime.now(horloge)` ; aucun champ envoyé par le client ne peut la remplacer.
+Le statut et la date sont enregistrés dans une même transaction.
+
+La résolution est autorisée avec ou sans prestataire : le sujet ne rend pas
+l'affectation obligatoire avant clôture. Le prestataire éventuel est conservé.
+La date doit être postérieure ou égale à l'ouverture (RG5) ; une ouverture située
+dans le futur provoque un refus 409 sans modification. Une seconde clôture est
+également refusée en 409 pour conserver la première date.
+
+`IncidentRepository.trouverPourResolution` utilise une requête JPQL paramétrée et
+un verrou `PESSIMISTIC_WRITE` pendant la transaction pour sérialiser les clôtures
+concurrentes. Le scénario de concurrence n'est pas testé automatiquement.
+La constante `Incident.STATUT_RESOLU` est partagée avec le contrôle des droits F6.
+La durée F5 s'arrête à la résolution et la fiche équipement affiche la clôture.
+F7 devra également interdire toute affectation ou réaffectation d'un incident résolu.
 
 ### Déclaration F4 et détail F5
 
@@ -263,6 +292,7 @@ et SQL. Les contrôles métier complets de saisie restent à implémenter en F10
 - **Message :** « Incident introuvable (identifiant …). », même principe pour station et équipement.
 - **Validation F4 :** `@Valid` et `BindingResult` réaffichent le formulaire avec un message français ; aucune exception personnalisée 400 pour ce cas.
 - **Modification F6 / 409 :** `ModificationIncidentInterditeException` empêche la modification d'un incident résolu.
+- **Résolution F8 / 409 :** `ResolutionIncidentInterditeException` refuse une double clôture ou une date antérieure à l'ouverture.
 - **Droits F6 / 403 :** `AccessDeniedException` est traitée par le gestionnaire web avec un message français.
 - **Pages :** `erreur.html` affiche le message et propose un retour à l'accueil.
 - **`ResponseEntity` :** non utilisé pour les routes Guardian actuelles, qui retournent des vues et redirections. Les routes héritées du TP utilisent aussi `ResponseStatusException`.
@@ -287,7 +317,8 @@ et SQL. Les contrôles métier complets de saisie restent à implémenter en F10
 | `EvaluationRepository.findByIncident_Id` | Évaluation éventuelle |
 | `UtilisateurRepository.findByLogin` | Utilisateur pour authentification |
 
-**JPQL explicite :** aucune requête `@Query` actuellement.
+**JPQL explicite :** `IncidentRepository.trouverPourResolution` sélectionne l'incident
+par identifiant avec `@Query` et un verrou d'écriture pour protéger la clôture.
 **SQL natif dans un repository :** absent ; exigence restant à satisfaire.
 Le script d'initialisation ne remplace pas cette exigence. Le futur choix devra
 comparer JPQL et SQL natif, justifier le besoin MariaDB, étudier portabilité
@@ -304,6 +335,7 @@ entités ; ils ne valident pas l'exécution du script MariaDB.
 | `IncidentService.consulterDetail`, `@Transactional(readOnly = true)` | Regrouper les lectures du détail et de l'évaluation sans modification métier |
 | `IncidentService.preparerModification`, lecture seule | Charger et vérifier l'incident pour le formulaire F6 |
 | `IncidentService.modifierIncident`, `@Transactional` | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
+| `IncidentService.resoudreIncident`, `@Transactional` | Vérifier et verrouiller l'incident, enregistrer statut et date ensemble (RG5 et RG10) |
 | Repositories Spring Data | Transactions standard, dont l'insertion F4 |
 | `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction |
 | Tests de données | Retour arrière après chaque test |
@@ -402,7 +434,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F7 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
+F7 et F9 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -424,7 +456,7 @@ restent également à effectuer.
 | F5 Détail d'un incident | Implémentée ; 6 tests dédiés |
 | F6 Modifier un incident | Réalisée ; permissions par profil et état, 13 tests dédiés |
 | F7 Affecter / réaffecter | Non réalisée |
-| F8 Résoudre un incident | Non réalisée |
+| F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
 | F9 Historique des résolus | Non réalisée ; incidents passés visibles dans la fiche équipement |
 | F10 Évaluer un prestataire | Saisie absente ; lecture disponible dans F5 |
 | F11 Tableau de bord | Non réalisé |
@@ -439,10 +471,11 @@ restent également à effectuer.
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
 - [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F7 à F12 et vérifier RG1 à RG11.
+- [ ] Terminer F7 et F9 à F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
-- [ ] Ajouter et justifier les requêtes JPQL et native demandées.
+- [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
+- [ ] Ajouter et justifier la requête native demandée.
 - [ ] Vérifier toutes les pages dans un navigateur sur ordinateur et mobile.
 - [ ] Nettoyer les restes du TP, commentaires obsolètes et traces console.
 - [ ] Harmoniser la version Java du POM.

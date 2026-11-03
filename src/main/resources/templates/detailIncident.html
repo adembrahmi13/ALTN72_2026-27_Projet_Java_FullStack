@@ -16,6 +16,10 @@
         <a class="bouton" th:href="@{/incidents/{id}/modifier(id=${incident.id})}">Modifier l'incident</a>
     </p>
     <p class="message-info" th:unless="${modificationAutorisee}">Cet incident est en lecture seule.</p>
+    <form th:if="${resolutionAutorisee}" th:action="@{/incidents/{id}/resoudre(id=${incident.id})}" method="post">
+        <p>La résolution clôture l'incident et conserve son historique. Il ne pourra plus être modifié.</p>
+        <button type="submit">Déclarer l'incident comme résolu</button>
+    </form>
     <dl>
         <dt>Description</dt>
         <dd th:text="${incident.description}"></dd>
