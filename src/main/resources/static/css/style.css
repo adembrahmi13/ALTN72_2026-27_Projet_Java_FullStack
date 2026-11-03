@@ -134,6 +134,7 @@ main.carte-erreur { max-width: 650px; text-align: center; margin-top: 4rem; }
 hr { border: 0; border-top: 1px solid var(--bordure); margin: 2rem 0; }
 .text-center { text-align: center; }
 .text-muted { color: var(--secondaire); }
+.bouton-secondaire { display: inline-block; padding: .7rem 1rem; margin-top: 1rem; }
 @media (max-width: 760px) {
     .entete-utilisateur { gap: .7rem 1rem; padding: 1rem; }
     .entete-utilisateur nav { order: 3; width: 100%; }

@@ -28,6 +28,10 @@ public class EquipementService {
                 .orElseThrow(() -> new RessourceIntrouvableException("Équipement", id));
     }
 
+    public List<Equipement> listerEquipements() {
+        return equipementRepository.findAll(org.springframework.data.domain.Sort.by("referenceUnique"));
+    }
+
     public List<Incident> listerIncidents(Integer equipementId) {
         return incidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc(equipementId);
     }

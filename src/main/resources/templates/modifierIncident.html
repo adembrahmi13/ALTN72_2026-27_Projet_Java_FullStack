@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Modifier un incident</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p><a th:href="@{/incidents/{id}(id=${incident.id})}">← Détail de l'incident</a></p>
+    <p class="surtitre">Correction du signalement</p>
+    <h1>Modifier l'incident n° <span th:text="${incident.id}"></span></h1>
+    <p class="message-info">La description d'un incident ouvert peut être corrigée.
+        Seul le responsable peut changer l'équipement, avant toute affectation.</p>
+    <form th:action="@{/incidents/{id}/modifier(id=${incident.id})}"
+          th:object="${modificationIncident}" method="post">
+        <label for="description">Description de la panne</label>
+        <textarea th:field="*{description}" rows="5" maxlength="255" required aria-describedby="aide-description"></textarea>
+        <p id="aide-description">Décrivez le problème en 255 caractères maximum.</p>
+        <p class="message-erreur" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
+        <div th:if="${changementEquipementAutorise}">
+            <label for="equipementId">Équipement concerné</label>
+            <select th:field="*{equipementId}" required>
+                <option th:each="equipement : ${equipements}" th:value="${equipement.id}"
+                        th:text="${equipement.referenceUnique + ' — ' + equipement.libelleDescription + ' (' + equipement.station.nom + ')'}"></option>
+            </select>
+            <p>La station est celle de l'équipement sélectionné.</p>
+        </div>
+        <div th:unless="${changementEquipementAutorise}">
+            <input type="hidden" th:field="*{equipementId}">
+            <p>Équipement : <strong th:text="${incident.equipement.referenceUnique}"></strong>
+                — <span th:text="${incident.equipement.station.nom}"></span></p>
+            <p>L'équipement est en lecture seule pour votre profil ou après affectation.</p>
+        </div>
+        <p class="message-erreur" th:if="${#fields.hasErrors('equipementId')}" th:errors="*{equipementId}"></p>
+        <button type="submit">Enregistrer les modifications</button>
+        <a class="bouton-secondaire" th:href="@{/incidents/{id}(id=${incident.id})}">Annuler</a>
+    </form>
+</main>
+</body>
+</html>

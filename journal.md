@@ -2,7 +2,7 @@
 
 **Groupe :** Adem BRAHMI, Kais DILMI
 
-**Mise à jour :** 30 octobre 2026
+**Mise à jour :** 3 novembre 2026
 
 **Date limite Moodle :** 5 novembre 2026 à 23 h 59.
 
@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F6 à F12 et les deux fonctions transverses restent à développer. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F7 à F12 et les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -122,7 +122,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Dernière validation après refonte HTML/CSS :** 16 tests, aucun échec ni erreur.
+- **Validation antérieure après refonte HTML/CSS :** 16 tests, aucun échec ni erreur. F6 ajoute 13 tests dédiés, soit 29 tests au total.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -135,6 +135,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F3 | Incidents triés par ouverture décroissante et équipement absent en 404 | `FicheEquipementTest` | 2 |
 | F4 | Création avec valeurs imposées, description vide refusée, équipement absent en 404 | `DeclarationIncidentTest` | 3 |
 | F5 | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement | `DetailIncidentTest` | 6 |
+| F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -150,7 +151,7 @@ et les durées exactes en jours, heures et minutes.
 | Historique global trié par résolution (RG7) | F9 non réalisée ; tri par ouverture d'équipement testé |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions propres aux profils (RG11) | Routes actuelles communes aux deux profils ; restrictions futures à ajouter |
+| Restrictions des futures fonctions F7–F11 (RG11) | Restrictions F6 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
 | API incidents, import/export et agrégations graphiques | Fonctionnalités absentes |
 | Script SQL MariaDB | Tests sur H2 uniquement |
 | Aspect visuel et comportement mobile réels | Pas de test navigateur ni de capture visuelle effectués |
@@ -178,14 +179,53 @@ absentes et les restrictions restant à implémenter sont indiquées dans le sui
 
 Les deux profils consultent et signalent les pannes. La cible réserve au
 responsable la coordination des prestataires, la clôture et l'évaluation.
-Pour F6, aucun champ d'incident n'est actuellement modifiable par une route dédiée ;
-champs autorisés, profils et conditions restent à définir.
+Pour F6, les deux profils peuvent corriger la description ; seul le responsable
+peut corriger l'équipement avant toute affectation. Les règles détaillées ci-dessous
+préservent l'historique et la cohérence de la prise en charge.
 
 `SecurityConfig` laisse publiques la connexion et les ressources CSS/images puis
 exige une authentification pour toute autre requête. `UtilisateurConnecte`
-fournit les rôles. Aucune règle `hasRole` différenciant les profils métier
-n'est encore configurée. Les restrictions futures devront être appliquées
-côté serveur et testées.
+fournit les rôles. `@EnableMethodSecurity` active `@PreAuthorize` sur les méthodes
+de préparation et d'enregistrement F6 : seuls les deux profils métier y accèdent.
+`DroitsIncident` contrôle les champs autorisés à partir du contexte de sécurité,
+sans accepter de profil transmis par le formulaire. Ces règles sont utilisées par
+le service et l'interface. Les restrictions F7–F11 restent à appliquer à leurs futures routes.
+
+### Modification des informations autorisées — F6
+
+Depuis le détail d'un incident ouvert, le bouton « Modifier l'incident » ouvre
+`GET /incidents/{id}/modifier`. Le formulaire prérempli envoie un POST vers la
+même URL ; après succès, une redirection vers le détail affiche une confirmation.
+L'action Annuler revient au détail sans enregistrer.
+
+| Information | Responsable d'exploitation | Agent de signalement | Justification |
+| --- | --- | --- | --- |
+| Description d'un incident ouvert | Modifiable | Modifiable | Corriger ou préciser le signalement, même après affectation |
+| Équipement d'un incident non affecté | Modifiable | Lecture seule | Le responsable peut corriger une erreur de rattachement avant intervention |
+| Équipement après affectation | Lecture seule | Lecture seule | Ne pas déplacer une intervention déjà engagée |
+| Station | Déduite de l'équipement | Lecture seule | Éviter un incident associé à une station incompatible avec l'équipement |
+| Identifiant et date d'ouverture | Lecture seule | Lecture seule | Préserver l'identité et le calcul des délais |
+| Statut, prestataire, résolution, évaluation | Non modifiables via F6 | Non modifiables via F6 | Opérations distinctes F7, F8 et F10, réservées au responsable |
+| Incident résolu | Lecture seule | Lecture seule | Préserver l'historique et les évaluations après clôture |
+
+Le responsable dispose de tous les droits métier prévus au tableau, mais reste
+soumis aux règles de cohérence : F6 ne permet pas de réécrire un incident clôturé.
+Les opérations futures F7, F8 et F10 ne sont pas ajoutées par ce formulaire.
+Le modèle actuel ne mémorise pas l'auteur du signalement : les droits sont donc
+définis par profil et état, sans restriction « uniquement ses propres incidents ».
+
+La description est obligatoire, limitée à 255 caractères (mapping JPA actuel) et
+nettoyée des espaces en début et fin. Le formulaire dédié `ModificationIncident`
+et une liste de champs autorisés au binding ne prennent que `description` et
+`equipementId`. Le service recharge l'incident avant l'enregistrement, vérifie son
+état et compare l'équipement demandé à l'équipement actuel. Envoyer un autre rôle,
+statut, identifiant ou une date dans la requête ne donne aucun droit supplémentaire.
+
+`IncidentService.modifierIncident` est transactionnel : la description et le
+rattachement sont enregistrés ensemble après validation. Un changement d'équipement
+interdit renvoie 403 ; une tentative sur un incident résolu renvoie 409 ; une
+ressource absente renvoie 404. Les tests contrôlent aussi l'absence de modifications
+partielles après refus. Les formulaires conservent la protection CSRF.
 
 ### Déclaration F4 et détail F5
 
@@ -222,7 +262,8 @@ et SQL. Les contrôles métier complets de saisie restent à implémenter en F10
 - **Justification :** recherche dans les services et réponse 404 centralisée, sans répéter le traitement dans chaque contrôleur.
 - **Message :** « Incident introuvable (identifiant …). », même principe pour station et équipement.
 - **Validation F4 :** `@Valid` et `BindingResult` réaffichent le formulaire avec un message français ; aucune exception personnalisée 400 pour ce cas.
-- **Transitions interdites / 409 :** aucune exception dédiée à ce stade.
+- **Modification F6 / 409 :** `ModificationIncidentInterditeException` empêche la modification d'un incident résolu.
+- **Droits F6 / 403 :** `AccessDeniedException` est traitée par le gestionnaire web avec un message français.
 - **Pages :** `erreur.html` affiche le message et propose un retour à l'accueil.
 - **`ResponseEntity` :** non utilisé pour les routes Guardian actuelles, qui retournent des vues et redirections. Les routes héritées du TP utilisent aussi `ResponseStatusException`.
 
@@ -261,6 +302,8 @@ entités ; ils ne valident pas l'exécution du script MariaDB.
 | Où | Pourquoi |
 | --- | --- |
 | `IncidentService.consulterDetail`, `@Transactional(readOnly = true)` | Regrouper les lectures du détail et de l'évaluation sans modification métier |
+| `IncidentService.preparerModification`, lecture seule | Charger et vérifier l'incident pour le formulaire F6 |
+| `IncidentService.modifierIncident`, `@Transactional` | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
 | Repositories Spring Data | Transactions standard, dont l'insertion F4 |
 | `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction |
 | Tests de données | Retour arrière après chaque test |
@@ -276,6 +319,7 @@ dans une transaction de service pour respecter RG10.
 - Déconnexion par POST `/deconnexion`, invalidation de session et suppression de `JSESSIONID`.
 - Protection CSRF conservée ; formulaires Thymeleaf et jetons CSRF dans les tests POST.
 - En-tête commun avec prénom, profil et déconnexion.
+- F6 : sécurité de méthode, permissions par champ et par état dans le service ; masquer un contrôle dans la vue ne remplace pas la vérification serveur.
 - API incidents absente ; sécurité et erreurs à valider lors de F12.
 
 ### Interface et CSS commun
@@ -358,7 +402,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F6 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
+F7 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -378,7 +422,7 @@ restent également à effectuer.
 | F3 Fiche équipement | Implémentée et testée |
 | F4 Déclarer un incident | Implémentée et testée |
 | F5 Détail d'un incident | Implémentée ; 6 tests dédiés |
-| F6 Modifier un incident | Non réalisée |
+| F6 Modifier un incident | Réalisée ; permissions par profil et état, 13 tests dédiés |
 | F7 Affecter / réaffecter | Non réalisée |
 | F8 Résoudre un incident | Non réalisée |
 | F9 Historique des résolus | Non réalisée ; incidents passés visibles dans la fiche équipement |
@@ -395,7 +439,7 @@ restent également à effectuer.
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
 - [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F6 à F12 et vérifier RG1 à RG11.
+- [ ] Terminer F7 à F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [ ] Ajouter et justifier les requêtes JPQL et native demandées.
