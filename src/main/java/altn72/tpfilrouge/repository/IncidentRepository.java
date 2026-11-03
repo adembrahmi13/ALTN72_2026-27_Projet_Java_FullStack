@@ -4,6 +4,7 @@ import altn72.tpfilrouge.modele.Incident;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
@@ -19,4 +20,8 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     // RG7 : les incidents d'un équipement sont ordonnés selon la date d'ouverture (le plus récent en premier)
     List<Incident> findByEquipement_IdOrderByDateHeureOuvertureDesc(Integer equipementId);
+
+    // RG7 : historique trié par clôture, puis identifiant pour un ordre stable à date égale.
+    @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
+    List<Incident> findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc(String statut);
 }

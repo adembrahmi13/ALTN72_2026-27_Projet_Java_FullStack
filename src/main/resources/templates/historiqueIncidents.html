@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Historique des incidents résolus</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p class="surtitre">Suivi des interventions</p>
+    <h1>Historique des incidents résolus</h1>
+    <p class="introduction">Retrouvez les incidents clôturés, de la résolution la plus récente à la plus ancienne.</p>
+    <p th:if="${#lists.isEmpty(incidents)}" class="message-info">Aucun incident résolu pour le moment.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Historique des incidents résolus"
+         th:unless="${#lists.isEmpty(incidents)}">
+        <table>
+            <caption>Incidents classés par date de résolution décroissante</caption>
+            <thead>
+            <tr>
+                <th scope="col">Résolution</th>
+                <th scope="col">Incident</th>
+                <th scope="col">Équipement</th>
+                <th scope="col">Station</th>
+                <th scope="col">Ouverture</th>
+                <th scope="col">Prestataire</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="incident : ${incidents}">
+                <td th:text="${#temporals.format(incident.dateHeureResolution, 'dd/MM/yyyy HH:mm')}"></td>
+                <td><a th:href="@{/incidents/{id}(id=${incident.id})}"><span th:text="${incident.description}"></span>
+                    <span th:text="${' (n° ' + incident.id + ')'}"></span></a></td>
+                <td><a th:href="@{/equipements/{id}(id=${incident.equipement.id})}"
+                       th:text="${incident.equipement.referenceUnique}"></a></td>
+                <td th:text="${incident.equipement.station.nom}"></td>
+                <td th:text="${#temporals.format(incident.dateHeureOuverture, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${incident.prestataire != null ? incident.prestataire.nom : 'Sans prestataire'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
