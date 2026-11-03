@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F7 et F9 à F12 ainsi que les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F7 et F10 à F12 ainsi que les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -122,7 +122,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Dernière validation :** `mvn verify` réussi ; 16 tests pour F1 à F5, 13 tests F6 et 10 tests F8, soit 39 tests, sans échec ni erreur.
+- **Dernière validation :** `mvn verify` réussi ; 16 tests pour F1 à F5, 13 tests F6, 10 tests F8 et 6 tests F9, soit 45 tests sans échec ni erreur.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -137,6 +137,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F5 | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement | `DetailIncidentTest` | 6 |
 | F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
+| F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -149,7 +150,6 @@ et les durées exactes en jours, heures et minutes.
 | Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
 | Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
 | Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F8 réalisée et testée ; F7 et F11 restent à réaliser |
-| Historique global trié par résolution (RG7) | F9 non réalisée ; tri par ouverture d'équipement testé |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
 | Restrictions des futures fonctions F7, F10 et F11 (RG11) | Restrictions F6 et F8 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
@@ -256,6 +256,31 @@ La constante `Incident.STATUT_RESOLU` est partagée avec le contrôle des droits
 La durée F5 s'arrête à la résolution et la fiche équipement affiche la clôture.
 F7 devra également interdire toute affectation ou réaffectation d'un incident résolu.
 
+### Historique des incidents résolus — F9
+
+Le lien « Historique des incidents » dans l'en-tête commun ouvre
+`GET /incidents/historique`. Les deux profils disposent d'un accès en lecture,
+conformément au tableau des droits. `IncidentService.consulterHistorique` est
+protégé par `@PreAuthorize` pour le responsable et l'agent et utilise une
+transaction en lecture seule.
+
+La requête dérivée sélectionne le statut « Résolu » avec une date de résolution
+non nulle. Elle trie par résolution décroissante (RG7), et non par ouverture ;
+l'identifiant décroissant départage les dates égales pour garantir un ordre stable.
+Les lignes incohérentes (statut résolu sans date ou date sans statut résolu)
+ne sont pas affichées. Un `@EntityGraph` charge l'équipement, la station et le
+prestataire pour éviter une requête supplémentaire par ligne lors du rendu.
+
+`historiqueIncidents.html` reprend la feuille CSS commune et le tableau défilant
+sur mobile. Il présente résolution, description et numéro d'incident, équipement,
+station, ouverture et prestataire éventuel. Les liens donnent accès au détail F5
+et à la fiche équipement. L'absence d'incidents est signalée par un message.
+Un incident clôturé par F8 apparaît à la consultation suivante ; aucune copie
+des données ou table d'archive supplémentaire n'est nécessaire.
+
+L'historique ne propose pas d'opération de modification. La pagination et les
+filtres ne sont pas implémentés dans cette version.
+
 ### Déclaration F4 et détail F5
 
 **F4 :** description obligatoire avec `@NotBlank`. Le service utilise l'équipement
@@ -314,6 +339,7 @@ et SQL. Les contrôles métier complets de saisie restent à implémenter en F10
 | `StationRepository.findAllByOrderByNomAsc` | Stations triées par nom |
 | `EquipementRepository.findByStation_Id` | Équipements d'une station |
 | `IncidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc` | Incidents d'un équipement, récents en premier |
+| `IncidentRepository.findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc` | Historique F9 : statut résolu, date de clôture présente, tri par clôture puis identifiant décroissants |
 | `EvaluationRepository.findByIncident_Id` | Évaluation éventuelle |
 | `UtilisateurRepository.findByLogin` | Utilisateur pour authentification |
 
@@ -336,6 +362,7 @@ entités ; ils ne valident pas l'exécution du script MariaDB.
 | `IncidentService.preparerModification`, lecture seule | Charger et vérifier l'incident pour le formulaire F6 |
 | `IncidentService.modifierIncident`, `@Transactional` | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
 | `IncidentService.resoudreIncident`, `@Transactional` | Vérifier et verrouiller l'incident, enregistrer statut et date ensemble (RG5 et RG10) |
+| `IncidentService.consulterHistorique`, lecture seule | Lire les incidents résolus et leurs relations pour F9 |
 | Repositories Spring Data | Transactions standard, dont l'insertion F4 |
 | `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction |
 | Tests de données | Retour arrière après chaque test |
@@ -360,7 +387,7 @@ Toutes les pages HTML utilisent `static/css/style.css`, y compris les anciennes
 pages programmeurs auparavant liées au CDN Bootstrap.
 
 - Variables CSS partagées : vert profond `#126b65`, texte bleu ardoise `#1c3046`, fond clair `#f3f6fa`, surfaces blanches.
-- En-tête Guardian avec liens Accueil et Stations et équipements.
+- En-tête Guardian avec liens Accueil, Stations et équipements, et Historique des incidents.
 - Cartes arrondies, ombres légères, espacements et titres harmonisés.
 - Boutons, champs, formulaires et messages d'erreur/information cohérents.
 - Stations en cartes ; fiches structurées en listes de description.
@@ -434,7 +461,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F7 et F9 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
+F7 et F10 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -457,7 +484,7 @@ restent également à effectuer.
 | F6 Modifier un incident | Réalisée ; permissions par profil et état, 13 tests dédiés |
 | F7 Affecter / réaffecter | Non réalisée |
 | F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
-| F9 Historique des résolus | Non réalisée ; incidents passés visibles dans la fiche équipement |
+| F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
 | F10 Évaluer un prestataire | Saisie absente ; lecture disponible dans F5 |
 | F11 Tableau de bord | Non réalisé |
 | F12 API incidents + Swagger | Non réalisée |
@@ -471,7 +498,7 @@ restent également à effectuer.
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
 - [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F7 et F9 à F12 et vérifier RG1 à RG11.
+- [ ] Terminer F7 et F10 à F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.Clock;
 import java.time.Duration;
+import java.util.List;
 import altn72.tpfilrouge.exception.RessourceIntrouvableException;
 import altn72.tpfilrouge.repository.EvaluationRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +69,13 @@ public class IncidentService {
                 .orElseThrow(() -> new RessourceIntrouvableException("Incident", id));
         return new DetailIncident(incident, calculerDureeOuverture(incident),
                 evaluationRepository.findByIncident_Id(id).orElse(null));
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('RESPONSABLE_EXPLOITATION', 'AGENT_SIGNALEMENT')")
+    public List<Incident> consulterHistorique() {
+        return incidentRepository
+                .findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc(Incident.STATUT_RESOLU);
     }
 
     @Transactional

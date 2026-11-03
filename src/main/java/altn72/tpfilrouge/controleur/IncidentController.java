@@ -87,6 +87,12 @@ public class IncidentController {
         return "detailIncident";
     }
 
+    @GetMapping("/incidents/historique")
+    public String consulterHistorique(Model model) {
+        model.addAttribute("incidents", incidentService.consulterHistorique());
+        return "historiqueIncidents";
+    }
+
     @PostMapping("/incidents/{id}/resoudre")
     public String resoudreIncident(@PathVariable Integer id, RedirectAttributes redirection) {
         incidentService.resoudreIncident(id);
