@@ -5,26 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d4d2069-84fe-43dc-9f5f-c7b177d8855a" name="Changes" comment="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/journal.md" beforeDir="false" afterPath="$PROJECT_DIR$/journal.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/controleur/IncidentController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/controleur/IncidentController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/modele/Incident.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/modele/Incident.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/exception/GestionnaireExceptionsWeb.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/exception/GestionnaireExceptionsWeb.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/service/EquipementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/service/EquipementService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/service/IncidentService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/service/IncidentService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/schema.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/connexion.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/connexion.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/detailsProgrammeur.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/detailsProgrammeur.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/equipements.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/equipements.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/erreur.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/erreur.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/ficheEquipement.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/ficheEquipement.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/listeProgrammeurs.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/listeProgrammeurs.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/nouveauProgrammeur.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/nouveauProgrammeur.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/nouvelIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/nouvelIncident.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/stations.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/stations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/detailIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/detailIncident.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,8 +46,8 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/consulter_fiche_equipement" />
-        <entry key="$PROJECT_DIR$" value="feat/fonctionnalité_connexion_deconnexion" />
+        <entry key="$PROJECT_DIR$" value="feat/consulter_details_equipement" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -97,23 +86,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.7554064262721485" />
-      <entry key="MS500" value="5.251429542073608" />
-      <entry key="S2" value="13.217394659731019" />
-      <entry key="S5" value="24.853127614568372" />
-      <entry key="S10" value="38.65629843237334" />
-      <entry key="S30" value="61.58512751607331" />
-      <entry key="S60" value="71.39848420260034" />
-      <entry key="M2" value="77.37181933532831" />
-      <entry key="M5" value="87.29873462422869" />
-      <entry key="M10" value="114.30470042911902" />
-      <entry key="M15" value="141.32358326373554" />
-      <entry key="M30" value="202.8514149873572" />
-      <entry key="H1" value="276.7803554032577" />
-      <entry key="H2" value="344.9250069536417" />
-      <entry key="H4" value="393.67704391628854" />
-      <entry key="D1" value="445.2289306829385" />
-      <entry key="W1" value="455.28547008799023" />
+      <entry key="MS100" value="1.0034958553310813" />
+      <entry key="MS500" value="2.489923889276628" />
+      <entry key="S2" value="12.725331888650059" />
+      <entry key="S5" value="29.30502089573984" />
+      <entry key="S10" value="54.624011692355516" />
+      <entry key="S30" value="126.17883191686445" />
+      <entry key="S60" value="181.3979961044425" />
+      <entry key="M2" value="230.85251942107448" />
+      <entry key="M5" value="304.85659466047537" />
+      <entry key="M10" value="383.6444504322844" />
+      <entry key="M15" value="438.9179593165315" />
+      <entry key="M30" value="545.1456980841515" />
+      <entry key="H1" value="657.1796476637688" />
+      <entry key="H2" value="755.4862903885402" />
+      <entry key="H4" value="825.1943776923627" />
+      <entry key="D1" value="899.071643944619" />
+      <entry key="W1" value="913.5325960885112" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -135,23 +124,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.6609136619696496" />
-      <entry key="MS500" value="5.194708657469082" />
-      <entry key="S2" value="13.181270391679712" />
-      <entry key="S5" value="24.825842797818783" />
-      <entry key="S10" value="38.635017654424594" />
-      <entry key="S30" value="61.57376274777828" />
-      <entry key="S60" value="71.39188218823405" />
-      <entry key="M2" value="77.3682378300549" />
-      <entry key="M5" value="87.29711068857749" />
-      <entry key="M10" value="114.30361212239602" />
-      <entry key="M15" value="141.32266250724055" />
-      <entry key="M30" value="202.8506879198684" />
-      <entry key="H1" value="276.77978270342663" />
-      <entry key="H2" value="344.9246080632787" />
-      <entry key="H4" value="393.6768012245104" />
-      <entry key="D1" value="445.22888229559777" />
-      <entry key="W1" value="455.28546294985915" />
+      <entry key="MS100" value="0.9427843215404966" />
+      <entry key="MS500" value="2.4590185628581" />
+      <entry key="S2" value="12.686878077473171" />
+      <entry key="S5" value="29.26905722529158" />
+      <entry key="S10" value="54.589370620333945" />
+      <entry key="S30" value="126.14817059259798" />
+      <entry key="S60" value="181.37283851265906" />
+      <entry key="M2" value="230.83351286448516" />
+      <entry key="M5" value="304.8439403455348" />
+      <entry key="M10" value="383.63598623220304" />
+      <entry key="M15" value="438.91153561833886" />
+      <entry key="M30" value="545.1418531493011" />
+      <entry key="H1" value="657.1773973035214" />
+      <entry key="H2" value="755.4850099726408" />
+      <entry key="H4" value="825.1936791900305" />
+      <entry key="D1" value="899.0715168212988" />
+      <entry key="W1" value="913.5325776225171" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -203,7 +192,7 @@
     "Spring Boot.TpFilRougeApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "feat/consulter__details__equipement",
+    "git-widget-placeholder": "feat/(F6)__Modifier__les__informations",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "P:/MES COURS/Developpement Full Stack avec Java/ALTN72 - 2026_2027/DEV_CODE/GitHub/TpFilRouge_CORRIGE_5",
@@ -316,7 +305,8 @@
       <workItem from="1793348878172" duration="913000" />
       <workItem from="1793350900653" duration="2081000" />
       <workItem from="1793357510840" duration="2526000" />
-      <workItem from="1793366506661" duration="7469000" />
+      <workItem from="1793366506661" duration="7950000" />
+      <workItem from="1793732769815" duration="1804000" />
     </task>
     <servers />
   </component>

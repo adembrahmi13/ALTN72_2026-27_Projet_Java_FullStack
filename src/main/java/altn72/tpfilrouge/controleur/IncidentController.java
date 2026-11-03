@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import altn72.tpfilrouge.formulaire.ModificationIncident;
+import altn72.tpfilrouge.service.DroitsIncident;
 
 @Controller
 public class IncidentController {
@@ -18,10 +23,51 @@ public class IncidentController {
 
     private final IncidentService incidentService;
     private final EquipementService equipementService;
+    private final DroitsIncident droitsIncident;
 
-    public IncidentController(IncidentService incidentService, EquipementService equipementService) {
+    public IncidentController(IncidentService incidentService, EquipementService equipementService, DroitsIncident droitsIncident) {
         this.incidentService = incidentService;
         this.equipementService = equipementService;
+        this.droitsIncident = droitsIncident;
+    }
+
+    @InitBinder("modificationIncident")
+    public void limiterChampsModification(WebDataBinder binder) {
+        binder.setAllowedFields("description", "equipementId");
+    }
+
+    @GetMapping("/incidents/{id}/modifier")
+    public String preparerModification(@PathVariable Integer id, Model model) {
+        Incident incident = incidentService.preparerModification(id);
+        ModificationIncident formulaire = new ModificationIncident();
+        formulaire.setDescription(incident.getDescription());
+        formulaire.setEquipementId(incident.getEquipement().getId());
+        model.addAttribute("modificationIncident", formulaire);
+        ajouterContexteModification(incident, model);
+        return "modifierIncident";
+    }
+
+    @PostMapping("/incidents/{id}/modifier")
+    public String modifierIncident(@PathVariable Integer id,
+                                   @Valid @ModelAttribute("modificationIncident") ModificationIncident formulaire,
+                                   BindingResult erreurs, Model model, RedirectAttributes redirection) {
+        Incident incident = incidentService.preparerModification(id);
+        if (erreurs.hasErrors()) {
+            ajouterContexteModification(incident, model);
+            return "modifierIncident";
+        }
+        incidentService.modifierIncident(id, formulaire);
+        redirection.addFlashAttribute("messageSucces", "Les modifications ont été enregistrées.");
+        return "redirect:/incidents/" + id;
+    }
+
+    private void ajouterContexteModification(Incident incident, Model model) {
+        model.addAttribute("incident", incident);
+        boolean autorise = droitsIncident.peutChangerEquipement(incident);
+        model.addAttribute("changementEquipementAutorise", autorise);
+        if (autorise) {
+            model.addAttribute("equipements", equipementService.listerEquipements());
+        }
     }
 
     @GetMapping("/equipements/{equipementId}/incidents/nouveau")
@@ -36,6 +82,7 @@ public class IncidentController {
         var detail = incidentService.consulterDetail(id);
         model.addAttribute("detail", detail);
         model.addAttribute("incident", detail.incident());
+        model.addAttribute("modificationAutorisee", droitsIncident.peutModifier(detail.incident()));
         return "detailIncident";
     }
 

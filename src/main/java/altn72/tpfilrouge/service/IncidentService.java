@@ -11,6 +11,10 @@ import java.time.Duration;
 import altn72.tpfilrouge.exception.RessourceIntrouvableException;
 import altn72.tpfilrouge.repository.EvaluationRepository;
 import org.springframework.transaction.annotation.Transactional;
+import altn72.tpfilrouge.formulaire.ModificationIncident;
+import altn72.tpfilrouge.exception.ModificationIncidentInterditeException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Service
 public class IncidentService {
@@ -18,13 +22,43 @@ public class IncidentService {
     private final EquipementService equipementService;
     private final EvaluationRepository evaluationRepository;
     private final Clock horloge;
+    private final DroitsIncident droitsIncident;
 
     public IncidentService(IncidentRepository incidentRepository, EquipementService equipementService,
-                           EvaluationRepository evaluationRepository, Clock horloge) {
+                           EvaluationRepository evaluationRepository, Clock horloge, DroitsIncident droitsIncident) {
         this.incidentRepository = incidentRepository;
         this.equipementService = equipementService;
         this.evaluationRepository = evaluationRepository;
         this.horloge = horloge;
+        this.droitsIncident = droitsIncident;
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAnyRole('RESPONSABLE_EXPLOITATION', 'AGENT_SIGNALEMENT')")
+    public Incident preparerModification(Integer id) {
+        Incident incident = incidentRepository.findById(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Incident", id));
+        if (!droitsIncident.peutModifier(incident)) {
+            throw new ModificationIncidentInterditeException();
+        }
+        return incident;
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyRole('RESPONSABLE_EXPLOITATION', 'AGENT_SIGNALEMENT')")
+    public void modifierIncident(Integer id, ModificationIncident modification) {
+        Incident incident = preparerModification(id);
+        if (modification.getDescription() == null || modification.getDescription().isBlank()
+                || modification.getDescription().length() > 255) {
+            throw new IllegalArgumentException("La description est obligatoire et limitée à 255 caractères.");
+        }
+        if (!incident.getEquipement().getId().equals(modification.getEquipementId())) {
+            if (!droitsIncident.peutChangerEquipement(incident)) {
+                throw new AccessDeniedException("Vous ne pouvez pas changer l'équipement de cet incident.");
+            }
+            incident.setEquipement(equipementService.trouverEquipement(modification.getEquipementId()));
+        }
+        incident.setDescription(modification.getDescription().strip());
     }
 
     @Transactional(readOnly = true)

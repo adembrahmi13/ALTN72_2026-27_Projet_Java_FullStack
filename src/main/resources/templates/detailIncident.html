@@ -11,6 +11,11 @@
 <main>
     <p><a th:href="@{/equipements/{id}(id=${incident.equipement.id})}">← Fiche de l'équipement</a></p>
     <h1>Incident n° <span th:text="${incident.id}"></span></h1>
+    <p class="message-info" th:if="${messageSucces}" th:text="${messageSucces}" role="status"></p>
+    <p th:if="${modificationAutorisee}">
+        <a class="bouton" th:href="@{/incidents/{id}/modifier(id=${incident.id})}">Modifier l'incident</a>
+    </p>
+    <p class="message-info" th:unless="${modificationAutorisee}">Cet incident est en lecture seule.</p>
     <dl>
         <dt>Description</dt>
         <dd th:text="${incident.description}"></dd>
