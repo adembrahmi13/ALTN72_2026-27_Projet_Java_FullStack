@@ -13,6 +13,7 @@ import altn72.tpfilrouge.repository.EvaluationRepository;
 import org.springframework.transaction.annotation.Transactional;
 import altn72.tpfilrouge.formulaire.ModificationIncident;
 import altn72.tpfilrouge.exception.ModificationIncidentInterditeException;
+import altn72.tpfilrouge.exception.ResolutionIncidentInterditeException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -67,6 +68,23 @@ public class IncidentService {
                 .orElseThrow(() -> new RessourceIntrouvableException("Incident", id));
         return new DetailIncident(incident, calculerDureeOuverture(incident),
                 evaluationRepository.findByIncident_Id(id).orElse(null));
+    }
+
+    @Transactional
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
+    public void resoudreIncident(Integer id) {
+        Incident incident = incidentRepository.trouverPourResolution(id)
+                .orElseThrow(() -> new RessourceIntrouvableException("Incident", id));
+        if (incident.getDateHeureResolution() != null || Incident.STATUT_RESOLU.equals(incident.getStatut())) {
+            throw new ResolutionIncidentInterditeException("Cet incident est déjà résolu.");
+        }
+        LocalDateTime resolution = LocalDateTime.now(horloge);
+        if (resolution.isBefore(incident.getDateHeureOuverture())) {
+            throw new ResolutionIncidentInterditeException(
+                    "La résolution ne peut pas être antérieure à l'ouverture de l'incident.");
+        }
+        incident.setStatut(Incident.STATUT_RESOLU);
+        incident.setDateHeureResolution(resolution);
     }
 
     public String calculerDureeOuverture(Incident incident) {

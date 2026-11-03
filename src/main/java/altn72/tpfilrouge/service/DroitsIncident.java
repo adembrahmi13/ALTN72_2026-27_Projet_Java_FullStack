@@ -17,7 +17,11 @@ public class DroitsIncident {
     public boolean peutModifier(Incident incident) {
         return (possedeRole("RESPONSABLE_EXPLOITATION") || possedeRole("AGENT_SIGNALEMENT"))
                 && incident.getDateHeureResolution() == null
-                && !"Résolu".equals(incident.getStatut());
+                && !Incident.STATUT_RESOLU.equals(incident.getStatut());
+    }
+
+    public boolean peutResoudre(Incident incident) {
+        return possedeRole("RESPONSABLE_EXPLOITATION") && peutModifier(incident);
     }
 
     public boolean peutChangerEquipement(Incident incident) {
