@@ -18,6 +18,14 @@ public class GestionnaireExceptionsWeb {
         return VUE_ERREUR;
     }
 
+    // Paramètre d'URL invalide (ex : /tableau-de-bord?niveau=VIOLET) : message clair au lieu de la page technique de Spring
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String gererParametreInvalide(Model model) {
+        model.addAttribute("message", "Un paramètre de l'adresse est invalide.");
+        return VUE_ERREUR;
+    }
+
     @ExceptionHandler(ResolutionIncidentInterditeException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String gererResolutionInterdite(ResolutionIncidentInterditeException exception, Model model) {

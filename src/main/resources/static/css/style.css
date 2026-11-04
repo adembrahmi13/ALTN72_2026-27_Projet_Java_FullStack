@@ -157,3 +157,18 @@ caption { padding: .8rem 1.15rem; text-align: left; color: var(--secondaire); fo
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; }
 }
+
+/* F11 : tableau de bord, niveaux d'attention (RG3 / RG4) */
+.compteurs { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 1rem; margin: 1.5rem 0; }
+.compteurs li { display: flex; align-items: center; gap: .6rem; padding: .8rem 1rem; border: 1px solid var(--bordure); border-radius: 12px; }
+.niveau { display: inline-block; padding: .25rem .7rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.niveau-VERT { background: #d9f2df; color: #1d6b34; }
+.niveau-ORANGE { background: #ffe7c2; color: #8a4b00; }
+.niveau-ROUGE { background: #fbd5d5; color: #9b1c1c; }
+.niveau-AFFECTE { background: #dbe6f5; color: #1f4b8a; }
+
+/* Lot alpha : graphiques en barres de la page Statistiques */
+.graphique { list-style: none; padding: 0; margin: 1rem 0 2rem; display: grid; gap: .7rem; }
+.graphique li { display: grid; grid-template-columns: minmax(120px, 25%) 1fr auto; align-items: center; gap: .8rem; }
+.graphique .fond-barre { background: #eef4f6; border-radius: 999px; height: 1.1rem; overflow: hidden; }
+.graphique .barre { display: block; height: 100%; background: var(--primaire); border-radius: 999px; }

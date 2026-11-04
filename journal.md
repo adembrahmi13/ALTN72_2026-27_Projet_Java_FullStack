@@ -61,8 +61,8 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **Déploiement :** aucune URL fournie à ce stade.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
-- **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F11 et F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
+- **Dates :** les incidents historiques restent datés de juin 2026 ; les incidents actifs du tableau de bord sont générés relativement à l'exécution du script (`NOW() - INTERVAL 47/48/72 HOUR`) pour couvrir les seuils de RG3.
+- **Limites :** le déploiement reste à réaliser. Le lot alpha comprend l'import CSV / export PDF et la page Statistiques, tous deux réservés au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -140,6 +140,8 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
 | F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
 | F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
+| F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué, niveau invalide dans l'URL (400), comptage par station (requête native) | `TableauDeBordTest` | 9 |
+| Statistiques (lot alpha) | Note moyenne par prestataire, incidents par type d'équipement, type sans incident absent, page avec les deux graphiques, agent refusé (403) et lien masqué | `StatistiquesTest` | 4 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
@@ -153,11 +155,11 @@ et les durées exactes en jours, heures et minutes.
 | Comportement | Situation |
 | --- | --- |
 | Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
-| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
-| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7 et F8 réalisées et testées ; F11 reste à réaliser |
+| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | Calcul dans `TableauDeBordService` avec horloge injectée, seuils testés à la minute près |
+| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7, F8 et F11 réalisées et testées |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Règles RG8 appliquées dans `EvaluationService` et testées |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions de la future fonction F11 (RG11) | Restrictions F6, F7, F8 et F10 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
+| Restrictions par profil (RG11) | Restrictions F6, F7, F8, F10 et F11 testées |
 | API incidents et agrégations graphiques | Fonctionnalités absentes |
 | Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB | Tests sur H2 uniquement |
@@ -196,8 +198,7 @@ fournit les rôles. `@EnableMethodSecurity` active `@PreAuthorize` sur les méth
 de préparation et d'enregistrement F6 : seuls les deux profils métier y accèdent.
 `DroitsIncident` contrôle les champs autorisés à partir du contexte de sécurité,
 sans accepter de profil transmis par le formulaire. Ces règles sont utilisées par
-le service et l'interface. F7, F8 et F10 sont également protégées au service ; la restriction
-F11 reste à appliquer à leurs futures routes.
+le service et l'interface. F7, F8, F10 et F11 sont également protégées au service.
 
 ### Modification des informations autorisées — F6
 
@@ -348,14 +349,36 @@ et SQL. `EvaluationService` vérifie RG8 avant l'enregistrement (incident résol
 | `IncidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc` | Incidents d'un équipement, récents en premier |
 | `IncidentRepository.findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc` | Historique F9 : statut résolu, date de clôture présente, tri par clôture puis identifiant décroissants |
 | `EvaluationRepository.findByIncident_Id` | Évaluation éventuelle |
+| `EvaluationRepository.existsByIncident_Id` | F10 : refuser une seconde évaluation (RG8) |
+| `IncidentRepository.findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc` | F11 : incidents actifs, du plus ancien au plus récent (RG6) |
 | `UtilisateurRepository.findByLogin` | Utilisateur pour authentification |
 
 **JPQL explicite :** `IncidentRepository.trouverPourResolution` sélectionne l'incident
 par identifiant avec `@Query` et un verrou d'écriture pour protéger la clôture.
-**SQL natif dans un repository :** absent ; exigence restant à satisfaire.
-Le script d'initialisation ne remplace pas cette exigence. Le futur choix devra
-comparer JPQL et SQL natif, justifier le besoin MariaDB, étudier portabilité
-et maintenance, et employer des paramètres liés.
+`EvaluationRepository.calculerNoteMoyenneParPrestataire` et `IncidentRepository.compterIncidentsParType`
+agrègent en JPQL (`avg`, `count`, `group by`) pour la page Statistiques du lot alpha.
+**Requête SQL native (unique) :** `IncidentRepository.compterIncidentsActifsParStation`,
+utilisée par l'indicateur « incidents actifs par station » du tableau de bord F11.
+Elle joint `incident`, `equipement` et `station`, garde les incidents sans date de
+résolution (RG6), puis compte par station avec `GROUP BY`. Le résultat est lu via
+l'interface de projection `IncidentsActifsParStation` (alias `nom` et `nombre`).
+
+*Analyse critique :*
+- **Ce qu'on y gagne :** la base fait l'agrégation et ne renvoie qu'une ligne par
+  station, au lieu de charger tous les incidents en mémoire pour les compter en Java.
+  Le SQL est lisible tel quel et peut être testé directement dans un client MariaDB.
+- **Ce qu'on y perd :** la requête porte sur les noms de **tables et colonnes**
+  (`date_heure_resolution`, `station_id`) et non sur les entités. Renommer un attribut
+  ou une colonne ne provoque aucune erreur de compilation : l'erreur n'apparaît qu'à
+  l'exécution. Aucune vérification au démarrage, contrairement au JPQL.
+- **Portabilité :** seul du SQL standard est utilisé (`JOIN`, `COUNT`, `GROUP BY`) ;
+  la requête fonctionne sur MariaDB et sur H2 (tests). Une syntaxe propre à MariaDB
+  l'aurait rendue intestable avec H2.
+- **Sécurité :** aucun paramètre n'est concaténé (la requête n'en a pas) ; un paramètre
+  futur devrait être lié (`:parametre`) pour éviter l'injection SQL.
+- **Conclusion :** ici, JPQL aurait suffi (`select new ...` avec `group by`). Le natif
+  est acceptable pour une agrégation simple et isolée, mais nous le limitons à cette
+  seule requête : pour le reste, les requêtes dérivées et JPQL restent plus sûres.
 
 **Script :** `src/main/resources/schema.sql`, ordre de création de station corrigé
 et unicité de l'évaluation ajoutée. Les tests H2 génèrent le schéma depuis les
@@ -406,7 +429,7 @@ pages programmeurs auparavant liées au CDN Bootstrap.
 - Respect de `prefers-reduced-motion` et polices système sans chargement externe.
 
 La couleur d'erreur ne représente pas une urgence d'incident.
-Le calcul des indicateurs et les constantes 48 h / 72 h de F11 restent à développer.
+Les seuils 48 h / 72 h sont les constantes `SEUIL_ORANGE_HEURES` et `SEUIL_ROUGE_HEURES` de `TableauDeBordService`, seul endroit où elles sont définies. Le niveau d'attention (`NiveauAttention`) est recalculé à chaque affichage avec l'heure courante, jamais enregistré en base.
 Les tests valident les templates et parcours couverts ; la vérification visuelle
 dans un navigateur reste à effectuer.
 
@@ -482,21 +505,20 @@ démonstration actuelle, à revoir pour des historiques volumineux.
 
 ### Visualisation des données — piste 2
 
-- **Besoin envisagé :** comprendre la répartition des pannes et les résultats d'intervention.
-- **État :** non implémentée ; bibliothèque et calculs à choisir.
+- **Besoin :** donner au responsable une vue d'ensemble que le tableau de bord F11 ne montre pas : la qualité des prestataires et les équipements qui tombent le plus en panne.
+- **État :** réalisée. Page `/statistiques`, réservée au responsable (`@PreAuthorize` sur `StatistiquesService`, lien masqué pour l'agent).
 
-| Graphique envisagé | Données | Type envisagé, à confirmer | État |
+| Graphique | Données | Calcul | État |
 | --- | --- | --- | --- |
-| Incidents par station | Nombre par station | Barres | Non réalisé |
-| Incidents par type d'équipement | Nombre par type | Barres | Non réalisé |
-| Délais de résolution | Durée des incidents clos par période | Courbe ou barres | Non réalisé |
-| Notes des prestataires | Moyenne des évaluations par prestataire | Barres | Non réalisé |
-| Évolution des incidents | Nombre d'ouvertures par période | Courbe | Non réalisé |
+| Notes des prestataires | Moyenne et nombre d'évaluations par prestataire | JPQL `avg` + `group by` (`EvaluationRepository.calculerNoteMoyenneParPrestataire`) | Réalisé |
+| Incidents par type d'équipement | Nombre d'incidents, ouverts et résolus | JPQL `count` + `group by` (`IncidentRepository.compterIncidentsParType`) | Réalisé |
+| Incidents actifs par station | Nombre par station | Requête SQL native, affichée sur le tableau de bord F11 | Réalisé (F11) |
+| Délais de résolution, évolution dans le temps | Durées et ouvertures par période | — | Non retenu |
 
-- **Choix et essais :** aucune bibliothèque graphique, route ou agrégation ajoutée.
-- **Fonctionnement et tests :** aucun graphique disponible ou testé.
-- **Difficultés :** pas de retour d'implémentation à ce stade.
-- **Suite :** choisir les graphiques retenus, les filtres et droits, développer les agrégations et vérifier leurs résultats.
+- **Choix et essais :** barres en HTML/CSS (largeur en pourcentage calculée dans le template), sans bibliothèque JavaScript : aucune dépendance ajoutée, rendu côté serveur comme le reste de l'application, lisible sans JavaScript. Les agrégations sont faites par la base (JPQL) et lues via des interfaces de projection (`NoteMoyennePrestataire`, `IncidentsParType`). La note moyenne répond aussi à F10, qui demande que la note soit consultable à un endroit pertinent.
+- **Fonctionnement et tests :** `StatistiquesTest` (4 tests) vérifie la moyenne (4 et 5 donnent 4,5), le comptage par type (un type sans incident n'apparaît pas), l'affichage des deux graphiques et le refus de l'agent. Vérifié aussi sur MariaDB avec les données de démonstration.
+- **Difficultés :** la barre du graphique par type a besoin d'une valeur de référence ; la liste étant triée du plus grand au plus petit, la première barre sert de 100 %.
+- **Limites :** pas de graphique temporel (délais, évolution), car les calculs de durée en JPQL dépendent de la base ; graphiques non interactifs.
 
 La refonte CSS améliore le socle et n'est pas comptée comme une fonctionnalité
 transverse du lot alpha.
@@ -525,7 +547,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F11 et F12, la visualisation du lot alpha et le déploiement restent à réaliser.
+Le déploiement reste à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -550,7 +572,7 @@ restent également à effectuer.
 | F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
 | F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
 | F10 Évaluer un prestataire | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés |
-| F11 Tableau de bord | Non réalisé |
+| F11 Tableau de bord | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau et par station, 9 tests dédiés |
 | F12 API incidents + Swagger | Non réalisée |
 | Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
 | Lot alpha 2 : graphiques | Non réalisé |
@@ -561,12 +583,12 @@ restent également à effectuer.
 
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
-- [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F11 et F12 et vérifier RG1 à RG11.
+- [x] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
+- [ ] Terminer F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
-- [ ] Réaliser et documenter les deux fonctions transverses.
+- [x] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
-- [ ] Ajouter et justifier la requête native demandée.
+- [x] Ajouter et justifier la requête native demandée.
 - [ ] Vérifier toutes les pages dans un navigateur sur ordinateur et mobile.
 - [ ] Nettoyer les restes du TP, commentaires obsolètes et traces console.
 - [ ] Harmoniser la version Java du POM.
