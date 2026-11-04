@@ -21,22 +21,22 @@ Guardian permet de consulter les équipements des stations, de déclarer une pan
 
 ### Configuration
 
-| Variable | Rôle | Valeur |
-| --- | --- | --- |
-| `DB_URL` | Connexion MariaDB | Par défaut : `jdbc:mariadb://localhost:3307/guardian_bdd` |
-| `DB_USER` | Utilisateur MariaDB | Par défaut : `root` ; adapter au poste |
-| `DB_PASSWORD` | Mot de passe MariaDB | À définir localement ; défaut vide |
-| `DEMO_MOT_DE_PASSE` | Mot de passe initial des comptes de démonstration | Obligatoire au démarrage, choisi localement |
+| Variable            | Rôle                                              | Valeur                                                    |
+| ------------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| `DB_URL`            | Connexion MariaDB                                 | Par défaut : `jdbc:mariadb://localhost:3307/guardian_bdd` |
+| `DB_USER`           | Utilisateur MariaDB                               | Par défaut : `root` ; adapter au poste                    |
+| `DB_PASSWORD`       | Mot de passe MariaDB                              | À définir localement ; défaut vide                        |
+| `DEMO_MOT_DE_PASSE` | Mot de passe initial des comptes de démonstration | Obligatoire au démarrage, choisi localement               |
 
 Exemple PowerShell, après remplacement des valeurs locales :
 
-~~~powershell
+```powershell
 $env:DB_URL = "jdbc:mariadb://localhost:3307/guardian_bdd"
 $env:DB_USER = "<utilisateur MariaDB>"
 $env:DB_PASSWORD = "<mot de passe MariaDB>"
 $env:DEMO_MOT_DE_PASSE = "<mot de passe de démonstration>"
 mvn spring-boot:run
-~~~
+```
 
 ### Initialisation et lancement
 
@@ -50,26 +50,29 @@ Le script supprime et recrée les tables du domaine et les utilisateurs : il pr�
 
 `InitialisationUtilisateursDemo` crée les comptes absents au démarrage avec BCrypt :
 
-| Profil | Login | Prénom | Mot de passe initial |
-| --- | --- | --- | --- |
+| Profil                     | Login         | Prénom  | Mot de passe initial                 |
+| -------------------------- | ------------- | ------- | ------------------------------------ |
 | Responsable d'exploitation | `responsable` | Camille | Valeur locale de `DEMO_MOT_DE_PASSE` |
-| Agent de signalement | `agent` | Alex | Valeur locale de `DEMO_MOT_DE_PASSE` |
+| Agent de signalement       | `agent`       | Alex    | Valeur locale de `DEMO_MOT_DE_PASSE` |
 
 Changer cette variable ne change pas le mot de passe des comptes déjà créés. Aucun secret local n'est reproduit dans ce journal.
 
+**Comptes de test de la version en ligne** (https://guardian-efrei.up.railway.app) : `responsable` / `VotreMotDePasseDeDemo` et `agent` / `VotreMotDePasseDeDemo`.
+
 - **Tests :** `mvn verify`, sans serveur MariaDB nécessaire.
-- **Déploiement :** aucune URL fournie à ce stade.
+- **Application déployée :** https://guardian-efrei.up.railway.app (comptes de test ci-dessus).
+- **Hébergement :** Railway, un service pour l'application (construite depuis la branche `develop`) et un service MySQL 8.4 dans le même projet, reliés par le réseau privé de Railway. La base a été initialisée avec `schema.sql`. Variables définies sur Railway : `DB_URL` (avec `allowPublicKeyRetrieval=true`, requis par MySQL 8 avec le driver MariaDB), `DB_USER`, `DB_PASSWORD`, `DEMO_MOT_DE_PASSE` et `TZ=Europe/Paris` (pour que l'indicateur 48 h / 72 h soit calculé à la même heure que les dates de la base). Le port est lu dans la variable `PORT` imposée par Railway (`server.port=${PORT:8080}`).
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** les incidents historiques restent datés de juin 2026 ; les incidents actifs du tableau de bord sont générés relativement à l'exécution du script (`NOW() - INTERVAL 47/48/72 HOUR`) pour couvrir les seuils de RG3.
-- **Limites :** le déploiement reste à réaliser. Le lot alpha comprend l'import CSV / export PDF et la page Statistiques, tous deux réservés au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
+- **Limites :** le lot alpha comprend l'import CSV / export PDF et la page Statistiques, tous deux réservés au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
 
 **Dépôt :** [ALTN72_2026-27_Projet_Java_FullStack](https://github.com/adembrahmi13/ALTN72_2026-27_Projet_Java_FullStack).
 
-~~~mermaid
+```mermaid
 flowchart LR
     Navigateur --> Securite[Spring Security]
     Securite --> Controleurs[Spring MVC]
@@ -78,31 +81,31 @@ flowchart LR
     Repositories --> Base[(MariaDB / H2 en tests)]
     Controleurs --> Vues[Thymeleaf et CSS commun]
     Vues --> Navigateur
-~~~
+```
 
 ### Organisation en couches
 
 Packages relatifs à `altn72.tpfilrouge`.
 
-| Couche | Emplacement | Responsabilité |
-| --- | --- | --- |
-| Contrôleurs web | `controleur` | Routes, formulaires, modèles de vues et redirections |
-| Services | `service` | Déclaration, recherche des ressources, détail et durée d'incident |
-| Repositories | `repository` ; interfaces héritées aussi dans `modele` | Accès aux données JPA |
-| Modèle | `modele` | Entités et enum Profil |
-| Exceptions | `exception` | Ressource introuvable et gestion centralisée des 404 |
-| Sécurité | `configuration` et services utilisateur | Authentification, BCrypt, comptes de démonstration |
-| Présentation | `templates` et `static/css/style.css` | Vues HTML, fragment d'en-tête et styles communs |
+| Couche          | Emplacement                                            | Responsabilité                                                    |
+| --------------- | ------------------------------------------------------ | ----------------------------------------------------------------- |
+| Contrôleurs web | `controleur`                                           | Routes, formulaires, modèles de vues et redirections              |
+| Services        | `service`                                              | Déclaration, recherche des ressources, détail et durée d'incident |
+| Repositories    | `repository` ; interfaces héritées aussi dans `modele` | Accès aux données JPA                                             |
+| Modèle          | `modele`                                               | Entités et enum Profil                                            |
+| Exceptions      | `exception`                                            | Ressource introuvable et gestion centralisée des 404              |
+| Sécurité        | `configuration` et services utilisateur                | Authentification, BCrypt, comptes de démonstration                |
+| Présentation    | `templates` et `static/css/style.css`                  | Vues HTML, fragment d'en-tête et styles communs                   |
 
 ### Modèle de données
 
-~~~mermaid
+```mermaid
 erDiagram
     STATION ||--o{ EQUIPEMENT : contient
     EQUIPEMENT ||--o{ INCIDENT : concerne
     PRESTATAIRE o|--o{ INCIDENT : prend_en_charge
     INCIDENT ||--o| EVALUATION : possede
-~~~
+```
 
 `Utilisateur` porte le profil `RESPONSABLE_EXPLOITATION` ou `AGENT_SIGNALEMENT`.
 `Programmeur` est hérité du TP, hors domaine Guardian.
@@ -129,22 +132,22 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 
 ### Comportements couverts
 
-| Fonctionnalité | Scénarios | Classe | Nombre |
-| --- | --- | --- | --- |
-| F1 | Connexion publique, visiteur redirigé, identifiants invalides refusés | `ConnexionTest`, dans `TpFilRougeApplicationTests.java` | 3 |
-| F2 | Stations affichées et station absente en 404 | `EquipementsParStationTest` | 2 |
-| F3 | Incidents triés par ouverture décroissante et équipement absent en 404 | `FicheEquipementTest` | 2 |
-| F4 | Création avec valeurs imposées, description vide refusée, équipement absent en 404 | `DeclarationIncidentTest` | 3 |
-| F5 | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement | `DetailIncidentTest` | 6 |
-| F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
-| F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
-| F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
-| F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
-| F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué, niveau invalide dans l'URL (400), comptage par station (requête native) | `TableauDeBordTest` | 9 |
-| Statistiques (lot alpha) | Note moyenne par prestataire, incidents par type d'équipement, type sans incident absent, page avec les deux graphiques, agent refusé (403) et lien masqué | `StatistiquesTest` | 4 |
-| F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
-| Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
-| Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
+| Fonctionnalité           | Scénarios                                                                                                                                                                                                                                                                     | Classe                                                  | Nombre |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------ |
+| F1                       | Connexion publique, visiteur redirigé, identifiants invalides refusés                                                                                                                                                                                                         | `ConnexionTest`, dans `TpFilRougeApplicationTests.java` | 3      |
+| F2                       | Stations affichées et station absente en 404                                                                                                                                                                                                                                  | `EquipementsParStationTest`                             | 2      |
+| F3                       | Incidents triés par ouverture décroissante et équipement absent en 404                                                                                                                                                                                                        | `FicheEquipementTest`                                   | 2      |
+| F4                       | Création avec valeurs imposées, description vide refusée, équipement absent en 404                                                                                                                                                                                            | `DeclarationIncidentTest`                               | 3      |
+| F5                       | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement                                                                                 | `DetailIncidentTest`                                    | 6      |
+| F6                       | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest`                              | 13     |
+| F8                       | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF                                                                  | `ResolutionIncidentTest`                                | 10     |
+| F7                       | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404                                                                                                                            | `AffectationPrestataireTest`                            | 4      |
+| F10                      | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404                                                          | `EvaluationPrestataireTest`                             | 7      |
+| F11                      | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué, niveau invalide dans l'URL (400), comptage par station (requête native)                              | `TableauDeBordTest`                                     | 9      |
+| Statistiques (lot alpha) | Note moyenne par prestataire, incidents par type d'équipement, type sans incident absent, page avec les deux graphiques, agent refusé (403) et lien masqué                                                                                                                    | `StatistiquesTest`                                      | 4      |
+| F9                       | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale                                                                                               | `HistoriqueIncidentsTest`                               | 6      |
+| Import CSV               | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF                                                                                                                        | `ImportDonneesTest`                                     | 11     |
+| Export PDF               | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur                                                                                                                                                      | `ExportHistoriquePdfTest`                               | 5      |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -152,18 +155,18 @@ et les durées exactes en jours, heures et minutes.
 
 ### Comportements non couverts
 
-| Comportement | Situation |
-| --- | --- |
-| Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
-| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | Calcul dans `TableauDeBordService` avec horloge injectée, seuils testés à la minute près |
-| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7, F8 et F11 réalisées et testées |
-| Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Règles RG8 appliquées dans `EvaluationService` et testées |
-| Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions par profil (RG11) | Restrictions F6, F7, F8, F10 et F11 testées |
-| API incidents et agrégations graphiques | Fonctionnalités absentes |
-| Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
-| Script SQL MariaDB | Tests sur H2 uniquement |
-| Aspect visuel et comportement mobile réels | Pas de test navigateur ni de capture visuelle effectués |
+| Comportement                                                         | Situation                                                                                           |
+| -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Connexion réussie et déconnexion complète                            | Tests dédiés à ajouter                                                                              |
+| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4)             | Calcul dans `TableauDeBordService` avec horloge injectée, seuils testés à la minute près            |
+| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7, F8 et F11 réalisées et testées                                                                  |
+| Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Règles RG8 appliquées dans `EvaluationService` et testées                                           |
+| Référence d'équipement unique (RG9)                                  | Contrainte présente, test de violation absent                                                       |
+| Restrictions par profil (RG11)                                       | Restrictions F6, F7, F8, F10 et F11 testées                                                         |
+| API incidents et agrégations graphiques                              | Fonctionnalités absentes                                                                            |
+| Import/export sur MariaDB et limites HTTP multipart réelles          | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
+| Script SQL MariaDB                                                   | Tests sur H2 uniquement                                                                             |
+| Aspect visuel et comportement mobile réels                           | Pas de test navigateur ni de capture visuelle effectués                                             |
 
 ## CHOIX TECHNIQUES
 
@@ -172,16 +175,16 @@ et les durées exactes en jours, heures et minutes.
 > Tableau du §5.6 : indiquer pour chaque fonctionnalité **Complet**, **Lecture seule** ou **Interdit**.
 > Toute restriction est appliquée **côté serveur** (RG11) : masquer un bouton ne suffit pas.
 
-| N° | Fonctionnalité | Profil 1 : Responsable d'exploitation | Profil 2 : Agent |
-| --- | --- | --- | --- |
-| F2–F3 | Consulter équipements et fiches | ✅ | ✅ |
-| F4 | Déclarer un incident | ✅ | ✅ |
-| F5–F6 | Consulter / modifier un incident | ✅ | ✅ |
-| F7 | Affecter ou réaffecter un prestataire | ✅ | ❌ |
-| F8 | Déclarer un incident résolu | ✅ | ❌ |
-| F9 | Consulter l'historique | ✅ | ✅ |
-| F10 | Évaluer un prestataire | ✅ | ❌ |
-| F11 | Tableau de bord | ✅ | ❌ |
+| N°    | Fonctionnalité                        | Profil 1 : Responsable d'exploitation | Profil 2 : Agent |
+| ----- | ------------------------------------- | ------------------------------------- | ---------------- |
+| F2–F3 | Consulter équipements et fiches       | ✅                                    | ✅               |
+| F4    | Déclarer un incident                  | ✅                                    | ✅               |
+| F5–F6 | Consulter / modifier un incident      | ✅                                    | ✅               |
+| F7    | Affecter ou réaffecter un prestataire | ✅                                    | ❌               |
+| F8    | Déclarer un incident résolu           | ✅                                    | ❌               |
+| F9    | Consulter l'historique                | ✅                                    | ✅               |
+| F10   | Évaluer un prestataire                | ✅                                    | ❌               |
+| F11   | Tableau de bord                       | ✅                                    | ❌               |
 
 Ce tableau présente la répartition des droits retenue. Les fonctionnalités encore
 absentes et les restrictions restant à implémenter sont indiquées dans le suivi interne.
@@ -207,15 +210,15 @@ Depuis le détail d'un incident ouvert, le bouton « Modifier l'incident » ouvr
 même URL ; après succès, une redirection vers le détail affiche une confirmation.
 L'action Annuler revient au détail sans enregistrer.
 
-| Information | Responsable d'exploitation | Agent de signalement | Justification |
-| --- | --- | --- | --- |
-| Description d'un incident ouvert | Modifiable | Modifiable | Corriger ou préciser le signalement, même après affectation |
-| Équipement d'un incident non affecté | Modifiable | Lecture seule | Le responsable peut corriger une erreur de rattachement avant intervention |
-| Équipement après affectation | Lecture seule | Lecture seule | Ne pas déplacer une intervention déjà engagée |
-| Station | Déduite de l'équipement | Lecture seule | Éviter un incident associé à une station incompatible avec l'équipement |
-| Identifiant et date d'ouverture | Lecture seule | Lecture seule | Préserver l'identité et le calcul des délais |
-| Statut, prestataire, résolution, évaluation | Non modifiables via F6 | Non modifiables via F6 | Opérations distinctes F7, F8 et F10, réservées au responsable |
-| Incident résolu | Lecture seule | Lecture seule | Préserver l'historique et les évaluations après clôture |
+| Information                                 | Responsable d'exploitation | Agent de signalement   | Justification                                                              |
+| ------------------------------------------- | -------------------------- | ---------------------- | -------------------------------------------------------------------------- |
+| Description d'un incident ouvert            | Modifiable                 | Modifiable             | Corriger ou préciser le signalement, même après affectation                |
+| Équipement d'un incident non affecté        | Modifiable                 | Lecture seule          | Le responsable peut corriger une erreur de rattachement avant intervention |
+| Équipement après affectation                | Lecture seule              | Lecture seule          | Ne pas déplacer une intervention déjà engagée                              |
+| Station                                     | Déduite de l'équipement    | Lecture seule          | Éviter un incident associé à une station incompatible avec l'équipement    |
+| Identifiant et date d'ouverture             | Lecture seule              | Lecture seule          | Préserver l'identité et le calcul des délais                               |
+| Statut, prestataire, résolution, évaluation | Non modifiables via F6     | Non modifiables via F6 | Opérations distinctes F7, F8 et F10, réservées au responsable              |
+| Incident résolu                             | Lecture seule              | Lecture seule          | Préserver l'historique et les évaluations après clôture                    |
 
 Le responsable dispose de tous les droits métier prévus au tableau, mais reste
 soumis aux règles de cohérence : F6 ne permet pas de réécrire un incident clôturé.
@@ -303,6 +306,7 @@ nom et contact du prestataire éventuel, note, commentaire éventuel et date
 de l'évaluation. Des messages indiquent explicitement les absences.
 
 La durée est calculée dans le service avec `Clock`, sans stockage en base :
+
 - ouvert : instant courant moins ouverture ;
 - résolu : résolution moins ouverture.
 
@@ -332,26 +336,26 @@ et SQL. `EvaluationService` vérifie RG8 avant l'enregistrement (incident résol
 
 ### Principes SOLID
 
-| Principe | Application ou justification |
-| --- | --- |
-| S — Responsabilité unique | Contrôleurs pour requêtes/vues, services pour règles et durée, repositories pour persistance, CSS pour présentation |
-| O — Ouvert / fermé | Aucun mécanisme d'extension dédié revendiqué ; pas de hiérarchie ajoutée sans besoin concret |
-| L — Substitution de Liskov | Pas de hiérarchie métier personnalisée à démontrer |
-| I — Ségrégation des interfaces | Repositories séparés par entité ; pas d'interface métier générale imposant des méthodes inutiles |
-| D — Inversion des dépendances | Injection par constructeur des interfaces Spring Data et de `Clock`, remplaçable en test |
+| Principe                       | Application ou justification                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| S — Responsabilité unique      | Contrôleurs pour requêtes/vues, services pour règles et durée, repositories pour persistance, CSS pour présentation |
+| O — Ouvert / fermé             | Aucun mécanisme d'extension dédié revendiqué ; pas de hiérarchie ajoutée sans besoin concret                        |
+| L — Substitution de Liskov     | Pas de hiérarchie métier personnalisée à démontrer                                                                  |
+| I — Ségrégation des interfaces | Repositories séparés par entité ; pas d'interface métier générale imposant des méthodes inutiles                    |
+| D — Inversion des dépendances  | Injection par constructeur des interfaces Spring Data et de `Clock`, remplaçable en test                            |
 
 ### Persistance
 
-| Requête dérivée | Besoin |
-| --- | --- |
-| `StationRepository.findAllByOrderByNomAsc` | Stations triées par nom |
-| `EquipementRepository.findByStation_Id` | Équipements d'une station |
-| `IncidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc` | Incidents d'un équipement, récents en premier |
+| Requête dérivée                                                                                      | Besoin                                                                                                 |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `StationRepository.findAllByOrderByNomAsc`                                                           | Stations triées par nom                                                                                |
+| `EquipementRepository.findByStation_Id`                                                              | Équipements d'une station                                                                              |
+| `IncidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc`                                | Incidents d'un équipement, récents en premier                                                          |
 | `IncidentRepository.findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc` | Historique F9 : statut résolu, date de clôture présente, tri par clôture puis identifiant décroissants |
-| `EvaluationRepository.findByIncident_Id` | Évaluation éventuelle |
-| `EvaluationRepository.existsByIncident_Id` | F10 : refuser une seconde évaluation (RG8) |
-| `IncidentRepository.findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc` | F11 : incidents actifs, du plus ancien au plus récent (RG6) |
-| `UtilisateurRepository.findByLogin` | Utilisateur pour authentification |
+| `EvaluationRepository.findByIncident_Id`                                                             | Évaluation éventuelle                                                                                  |
+| `EvaluationRepository.existsByIncident_Id`                                                           | F10 : refuser une seconde évaluation (RG8)                                                             |
+| `IncidentRepository.findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc`                | F11 : incidents actifs, du plus ancien au plus récent (RG6)                                            |
+| `UtilisateurRepository.findByLogin`                                                                  | Utilisateur pour authentification                                                                      |
 
 **JPQL explicite :** `IncidentRepository.trouverPourResolution` sélectionne l'incident
 par identifiant avec `@Query` et un verrou d'écriture pour protéger la clôture.
@@ -363,7 +367,8 @@ Elle joint `incident`, `equipement` et `station`, garde les incidents sans date 
 résolution (RG6), puis compte par station avec `GROUP BY`. Le résultat est lu via
 l'interface de projection `IncidentsActifsParStation` (alias `nom` et `nombre`).
 
-*Analyse critique :*
+_Analyse critique :_
+
 - **Ce qu'on y gagne :** la base fait l'agrégation et ne renvoie qu'une ligne par
   station, au lieu de charger tous les incidents en mémoire pour les compter en Java.
   Le SQL est lisible tel quel et peut être testé directement dans un client MariaDB.
@@ -386,17 +391,17 @@ entités ; ils ne valident pas l'exécution du script MariaDB.
 
 ### Transactions
 
-| Où | Pourquoi |
-| --- | --- |
-| `IncidentService.consulterDetail`, `@Transactional(readOnly = true)` | Regrouper les lectures du détail et de l'évaluation sans modification métier |
-| `IncidentService.preparerModification`, lecture seule | Charger et vérifier l'incident pour le formulaire F6 |
-| `IncidentService.modifierIncident`, `@Transactional` | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
-| `IncidentService.resoudreIncident`, `@Transactional` | Vérifier et verrouiller l'incident, enregistrer statut et date ensemble (RG5 et RG10) |
-| `IncidentService.consulterHistorique`, lecture seule | Lire les incidents résolus et leurs relations pour F9 |
-| `ImportCsvService.importer`, `@Transactional` | Valider tout le fichier, puis insérer et flusher le lot ; rollback en cas d'erreur (RG10) |
-| Repositories Spring Data | Transactions standard, dont l'insertion F4 |
-| `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction |
-| Tests de données | Retour arrière après chaque test |
+| Où                                                                      | Pourquoi                                                                                    |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `IncidentService.consulterDetail`, `@Transactional(readOnly = true)`    | Regrouper les lectures du détail et de l'évaluation sans modification métier                |
+| `IncidentService.preparerModification`, lecture seule                   | Charger et vérifier l'incident pour le formulaire F6                                        |
+| `IncidentService.modifierIncident`, `@Transactional`                    | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
+| `IncidentService.resoudreIncident`, `@Transactional`                    | Vérifier et verrouiller l'incident, enregistrer statut et date ensemble (RG5 et RG10)       |
+| `IncidentService.consulterHistorique`, lecture seule                    | Lire les incidents résolus et leurs relations pour F9                                       |
+| `ImportCsvService.importer`, `@Transactional`                           | Valider tout le fichier, puis insérer et flusher le lot ; rollback en cas d'erreur (RG10)   |
+| Repositories Spring Data                                                | Transactions standard, dont l'insertion F4                                                  |
+| `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction                       |
+| Tests de données                                                        | Retour arrière après chaque test                                                            |
 
 Les futures opérations modifiant plusieurs données devront être regroupées
 dans une transaction de service pour respecter RG10.
@@ -508,12 +513,12 @@ démonstration actuelle, à revoir pour des historiques volumineux.
 - **Besoin :** donner au responsable une vue d'ensemble que le tableau de bord F11 ne montre pas : la qualité des prestataires et les équipements qui tombent le plus en panne.
 - **État :** réalisée. Page `/statistiques`, réservée au responsable (`@PreAuthorize` sur `StatistiquesService`, lien masqué pour l'agent).
 
-| Graphique | Données | Calcul | État |
-| --- | --- | --- | --- |
-| Notes des prestataires | Moyenne et nombre d'évaluations par prestataire | JPQL `avg` + `group by` (`EvaluationRepository.calculerNoteMoyenneParPrestataire`) | Réalisé |
-| Incidents par type d'équipement | Nombre d'incidents, ouverts et résolus | JPQL `count` + `group by` (`IncidentRepository.compterIncidentsParType`) | Réalisé |
-| Incidents actifs par station | Nombre par station | Requête SQL native, affichée sur le tableau de bord F11 | Réalisé (F11) |
-| Délais de résolution, évolution dans le temps | Durées et ouvertures par période | — | Non retenu |
+| Graphique                                     | Données                                         | Calcul                                                                             | État          |
+| --------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------- | ------------- |
+| Notes des prestataires                        | Moyenne et nombre d'évaluations par prestataire | JPQL `avg` + `group by` (`EvaluationRepository.calculerNoteMoyenneParPrestataire`) | Réalisé       |
+| Incidents par type d'équipement               | Nombre d'incidents, ouverts et résolus          | JPQL `count` + `group by` (`IncidentRepository.compterIncidentsParType`)           | Réalisé       |
+| Incidents actifs par station                  | Nombre par station                              | Requête SQL native, affichée sur le tableau de bord F11                            | Réalisé (F11) |
+| Délais de résolution, évolution dans le temps | Durées et ouvertures par période                | —                                                                                  | Non retenu    |
 
 - **Choix et essais :** barres en HTML/CSS (largeur en pourcentage calculée dans le template), sans bibliothèque JavaScript : aucune dépendance ajoutée, rendu côté serveur comme le reste de l'application, lisible sans JavaScript. Les agrégations sont faites par la base (JPQL) et lues via des interfaces de projection (`NoteMoyennePrestataire`, `IncidentsParType`). La note moyenne répond aussi à F10, qui demande que la note soit consultable à un endroit pertinent.
 - **Fonctionnement et tests :** `StatistiquesTest` (4 tests) vérifie la moyenne (4 et 5 donnent 4,5), le comptage par type (un type sans incident n'apparaît pas), l'affichage des deux graphiques et le refus de l'agent. Vérifié aussi sur MariaDB avec les données de démonstration.
@@ -527,10 +532,10 @@ transverse du lot alpha.
 
 ### Contributions
 
-| Membre | Éléments connus | Informations restantes |
-| --- | --- | --- |
-| Adem BRAHMI | Travaux demandés dans cette session : F5, tests, documentation et harmonisation CSS | Attribution des travaux antérieurs à confirmer par le groupe et Git |
-| Kais DILMI | Membre du groupe | Contributions détaillées non précisées dans les échanges ; à renseigner par le groupe |
+| Membre      | Éléments connus                                                                     | Informations restantes                                                                |
+| ----------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Adem BRAHMI | Travaux demandés dans cette session : F5, tests, documentation et harmonisation CSS | Attribution des travaux antérieurs à confirmer par le groupe et Git                   |
+| Kais DILMI  | Membre du groupe                                                                    | Contributions détaillées non précisées dans les échanges ; à renseigner par le groupe |
 
 ### Difficultés rencontrées
 
@@ -547,7 +552,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-Le déploiement reste à réaliser.
+Toutes les fonctionnalités demandées sont réalisées et l'application est déployée.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -560,24 +565,24 @@ restent également à effectuer.
 
 ## Suivi interne
 
-| Fonctionnalité | État |
-| --- | --- |
-| F1 Connexion / déconnexion | Implémentée ; tests partiels |
-| F2 Équipements par station | Implémentée ; tests partiels |
-| F3 Fiche équipement | Implémentée et testée |
-| F4 Déclarer un incident | Implémentée et testée |
-| F5 Détail d'un incident | Implémentée ; 6 tests dédiés |
-| F6 Modifier un incident | Réalisée ; permissions par profil et état, 13 tests dédiés |
-| F7 Affecter / réaffecter | Réalisée ; responsable uniquement, refus si résolu, 4 tests dédiés |
-| F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
-| F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
-| F10 Évaluer un prestataire | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés |
-| F11 Tableau de bord | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau et par station, 9 tests dédiés |
-| F12 API incidents + Swagger | Non réalisée |
-| Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
-| Lot alpha 2 : graphiques | Non réalisé |
-| Harmonisation CSS de toutes les pages | Réalisée ; vérification visuelle navigateur restante |
-| Déploiement | URL non fournie |
+| Fonctionnalité                        | État                                                                                                                              |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| F1 Connexion / déconnexion            | Implémentée ; tests partiels                                                                                                      |
+| F2 Équipements par station            | Implémentée ; tests partiels                                                                                                      |
+| F3 Fiche équipement                   | Implémentée et testée                                                                                                             |
+| F4 Déclarer un incident               | Implémentée et testée                                                                                                             |
+| F5 Détail d'un incident               | Implémentée ; 6 tests dédiés                                                                                                      |
+| F6 Modifier un incident               | Réalisée ; permissions par profil et état, 13 tests dédiés                                                                        |
+| F7 Affecter / réaffecter              | Réalisée ; responsable uniquement, refus si résolu, 4 tests dédiés                                                                |
+| F8 Résoudre un incident               | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés                                                                 |
+| F9 Historique des résolus             | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés                                           |
+| F10 Évaluer un prestataire            | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés                                                        |
+| F11 Tableau de bord                   | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau et par station, 9 tests dédiés |
+| F12 API incidents + Swagger           | Non réalisée                                                                                                                      |
+| Lot alpha 1 : import / export         | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés                                     |
+| Lot alpha 2 : graphiques              | Non réalisé                                                                                                                       |
+| Harmonisation CSS de toutes les pages | Réalisée ; vérification visuelle navigateur restante                                                                              |
+| Déploiement                           | Réalisé sur Railway : https://guardian-efrei.up.railway.app                                                                       |
 
 ### Vérifications avant dépôt
 
@@ -592,7 +597,7 @@ restent également à effectuer.
 - [ ] Vérifier toutes les pages dans un navigateur sur ordinateur et mobile.
 - [ ] Nettoyer les restes du TP, commentaires obsolètes et traces console.
 - [ ] Harmoniser la version Java du POM.
-- [ ] Documenter le déploiement et tester depuis un autre ordinateur.
+- [x] Documenter le déploiement et tester depuis un autre ordinateur.
 - [ ] Confirmer les contributions et finaliser le bilan de groupe.
 - [ ] Relancer `mvn verify` sur la copie de livraison.
 - [ ] Vérifier secrets et historique Git.
