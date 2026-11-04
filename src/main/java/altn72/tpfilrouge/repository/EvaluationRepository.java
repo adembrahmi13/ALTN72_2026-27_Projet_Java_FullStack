@@ -6,5 +6,6 @@ import java.util.Optional;
 
 public interface EvaluationRepository extends JpaRepository<Evaluation, Integer> {
     Optional<Evaluation> findByIncident_Id(Integer incidentId);
-}
 
+    boolean existsByIncident_Id(Integer incidentId);
+}

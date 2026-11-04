@@ -88,6 +88,8 @@ public class IncidentController {
         model.addAttribute("incident", detail.incident());
         model.addAttribute("modificationAutorisee", droitsIncident.peutModifier(detail.incident()));
         model.addAttribute("resolutionAutorisee", droitsIncident.peutResoudre(detail.incident()));
+        model.addAttribute("evaluationAutorisee",
+                detail.evaluation() == null && droitsIncident.peutEvaluer(detail.incident()));
         model.addAttribute("affectationAutorisee", droitsIncident.peutAffecter(detail.incident()));
         model.addAttribute("prestataires", affectationService.listerPrestataires());
         return "detailIncident";

@@ -28,6 +28,12 @@ public class DroitsIncident {
         return peutResoudre(incident);
     }
 
+    public boolean peutEvaluer(Incident incident) {
+        return possedeRole("RESPONSABLE_EXPLOITATION")
+                && incident.getDateHeureResolution() != null
+                && incident.getPrestataireId() != null;
+    }
+
     public boolean peutChangerEquipement(Incident incident) {
         return peutModifier(incident) && possedeRole("RESPONSABLE_EXPLOITATION")
                 && incident.getPrestataireId() == null

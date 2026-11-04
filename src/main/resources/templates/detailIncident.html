@@ -57,6 +57,9 @@
     </section>
     <h2>Évaluation</h2>
     <p th:if="${detail.evaluation == null}">Aucune évaluation.</p>
+    <p th:if="${evaluationAutorisee}">
+        <a class="bouton" th:href="@{/incidents/{id}/evaluer(id=${incident.id})}">Évaluer le prestataire</a>
+    </p>
     <dl th:if="${detail.evaluation != null}">
         <dt>Note</dt><dd><span th:text="${detail.evaluation.note}"></span> / 5</dd>
         <dt>Commentaire</dt>
