@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F7 et F10 à F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F11 et F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -138,6 +138,8 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F5 | Agent sans prestataire/évaluation, responsable avec prestataire/évaluation et durée arrêtée, affectation sans évaluation, incident absent en 404, visiteur redirigé, lien depuis l'équipement | `DetailIncidentTest` | 6 |
 | F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
+| F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
+| F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
@@ -152,10 +154,10 @@ et les durées exactes en jours, heures et minutes.
 | --- | --- |
 | Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
 | Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
-| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F8 réalisée et testée ; F7 et F11 restent à réaliser |
-| Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
+| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7 et F8 réalisées et testées ; F11 reste à réaliser |
+| Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Règles RG8 appliquées dans `EvaluationService` et testées |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions des futures fonctions F7, F10 et F11 (RG11) | Restrictions F6 et F8 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
+| Restrictions de la future fonction F11 (RG11) | Restrictions F6, F7, F8 et F10 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
 | API incidents et agrégations graphiques | Fonctionnalités absentes |
 | Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB | Tests sur H2 uniquement |
@@ -194,8 +196,8 @@ fournit les rôles. `@EnableMethodSecurity` active `@PreAuthorize` sur les méth
 de préparation et d'enregistrement F6 : seuls les deux profils métier y accèdent.
 `DroitsIncident` contrôle les champs autorisés à partir du contexte de sécurité,
 sans accepter de profil transmis par le formulaire. Ces règles sont utilisées par
-le service et l'interface. F8 est également protégée au service ; les restrictions
-F7, F10 et F11 restent à appliquer à leurs futures routes.
+le service et l'interface. F7, F8 et F10 sont également protégées au service ; la restriction
+F11 reste à appliquer à leurs futures routes.
 
 ### Modification des informations autorisées — F6
 
@@ -258,7 +260,7 @@ un verrou `PESSIMISTIC_WRITE` pendant la transaction pour sérialiser les clôtu
 concurrentes. Le scénario de concurrence n'est pas testé automatiquement.
 La constante `Incident.STATUT_RESOLU` est partagée avec le contrôle des droits F6.
 La durée F5 s'arrête à la résolution et la fiche équipement affiche la clôture.
-F7 devra également interdire toute affectation ou réaffectation d'un incident résolu.
+F7 interdit également toute affectation ou réaffectation d'un incident résolu (`AffectationIncidentInterditeException`, 409).
 
 ### Historique des incidents résolus — F9
 
@@ -312,7 +314,7 @@ et ne continue pas à augmenter après résolution.
 `@ManyToOne` en lecture seule (`insertable=false, updatable=false`)
 permet de consulter le prestataire. `EvaluationRepository.findByIncident_Id`
 retrouve l'évaluation. L'unicité de `evaluation.incident_id` est définie dans JPA
-et SQL. Les contrôles métier complets de saisie restent à implémenter en F10.
+et SQL. `EvaluationService` vérifie RG8 avant l'enregistrement (incident résolu, prestataire affecté, pas d'évaluation existante, note de 1 à 5).
 
 ### Exceptions
 
@@ -523,7 +525,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F7 et F10 à F12, la visualisation du lot alpha et le déploiement restent à réaliser.
+F11 et F12, la visualisation du lot alpha et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -544,10 +546,10 @@ restent également à effectuer.
 | F4 Déclarer un incident | Implémentée et testée |
 | F5 Détail d'un incident | Implémentée ; 6 tests dédiés |
 | F6 Modifier un incident | Réalisée ; permissions par profil et état, 13 tests dédiés |
-| F7 Affecter / réaffecter | Non réalisée |
+| F7 Affecter / réaffecter | Réalisée ; responsable uniquement, refus si résolu, 4 tests dédiés |
 | F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
 | F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
-| F10 Évaluer un prestataire | Saisie absente ; lecture disponible dans F5 |
+| F10 Évaluer un prestataire | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés |
 | F11 Tableau de bord | Non réalisé |
 | F12 API incidents + Swagger | Non réalisée |
 | Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
@@ -560,7 +562,7 @@ restent également à effectuer.
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
 - [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F7 et F10 à F12 et vérifier RG1 à RG11.
+- [ ] Terminer F11 et F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
