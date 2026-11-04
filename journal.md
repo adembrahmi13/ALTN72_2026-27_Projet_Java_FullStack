@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** les incidents historiques restent datés de juin 2026 ; les incidents actifs du tableau de bord sont générés relativement à l'exécution du script (`NOW() - INTERVAL 47/48/72 HOUR`) pour couvrir les seuils de RG3.
-- **Limites :** F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
+- **Limites :** le déploiement reste à réaliser. Le lot alpha comprend l'import CSV / export PDF et la page Statistiques, tous deux réservés au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -141,6 +141,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
 | F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
 | F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué, niveau invalide dans l'URL (400), comptage par station (requête native) | `TableauDeBordTest` | 9 |
+| Statistiques (lot alpha) | Note moyenne par prestataire, incidents par type d'équipement, type sans incident absent, page avec les deux graphiques, agent refusé (403) et lien masqué | `StatistiquesTest` | 4 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
@@ -354,6 +355,8 @@ et SQL. `EvaluationService` vérifie RG8 avant l'enregistrement (incident résol
 
 **JPQL explicite :** `IncidentRepository.trouverPourResolution` sélectionne l'incident
 par identifiant avec `@Query` et un verrou d'écriture pour protéger la clôture.
+`EvaluationRepository.calculerNoteMoyenneParPrestataire` et `IncidentRepository.compterIncidentsParType`
+agrègent en JPQL (`avg`, `count`, `group by`) pour la page Statistiques du lot alpha.
 **Requête SQL native (unique) :** `IncidentRepository.compterIncidentsActifsParStation`,
 utilisée par l'indicateur « incidents actifs par station » du tableau de bord F11.
 Elle joint `incident`, `equipement` et `station`, garde les incidents sans date de
@@ -502,21 +505,20 @@ démonstration actuelle, à revoir pour des historiques volumineux.
 
 ### Visualisation des données — piste 2
 
-- **Besoin envisagé :** comprendre la répartition des pannes et les résultats d'intervention.
-- **État :** non implémentée ; bibliothèque et calculs à choisir.
+- **Besoin :** donner au responsable une vue d'ensemble que le tableau de bord F11 ne montre pas : la qualité des prestataires et les équipements qui tombent le plus en panne.
+- **État :** réalisée. Page `/statistiques`, réservée au responsable (`@PreAuthorize` sur `StatistiquesService`, lien masqué pour l'agent).
 
-| Graphique envisagé | Données | Type envisagé, à confirmer | État |
+| Graphique | Données | Calcul | État |
 | --- | --- | --- | --- |
-| Incidents par station | Nombre par station | Barres | Non réalisé |
-| Incidents par type d'équipement | Nombre par type | Barres | Non réalisé |
-| Délais de résolution | Durée des incidents clos par période | Courbe ou barres | Non réalisé |
-| Notes des prestataires | Moyenne des évaluations par prestataire | Barres | Non réalisé |
-| Évolution des incidents | Nombre d'ouvertures par période | Courbe | Non réalisé |
+| Notes des prestataires | Moyenne et nombre d'évaluations par prestataire | JPQL `avg` + `group by` (`EvaluationRepository.calculerNoteMoyenneParPrestataire`) | Réalisé |
+| Incidents par type d'équipement | Nombre d'incidents, ouverts et résolus | JPQL `count` + `group by` (`IncidentRepository.compterIncidentsParType`) | Réalisé |
+| Incidents actifs par station | Nombre par station | Requête SQL native, affichée sur le tableau de bord F11 | Réalisé (F11) |
+| Délais de résolution, évolution dans le temps | Durées et ouvertures par période | — | Non retenu |
 
-- **Choix et essais :** aucune bibliothèque graphique, route ou agrégation ajoutée.
-- **Fonctionnement et tests :** aucun graphique disponible ou testé.
-- **Difficultés :** pas de retour d'implémentation à ce stade.
-- **Suite :** choisir les graphiques retenus, les filtres et droits, développer les agrégations et vérifier leurs résultats.
+- **Choix et essais :** barres en HTML/CSS (largeur en pourcentage calculée dans le template), sans bibliothèque JavaScript : aucune dépendance ajoutée, rendu côté serveur comme le reste de l'application, lisible sans JavaScript. Les agrégations sont faites par la base (JPQL) et lues via des interfaces de projection (`NoteMoyennePrestataire`, `IncidentsParType`). La note moyenne répond aussi à F10, qui demande que la note soit consultable à un endroit pertinent.
+- **Fonctionnement et tests :** `StatistiquesTest` (4 tests) vérifie la moyenne (4 et 5 donnent 4,5), le comptage par type (un type sans incident n'apparaît pas), l'affichage des deux graphiques et le refus de l'agent. Vérifié aussi sur MariaDB avec les données de démonstration.
+- **Difficultés :** la barre du graphique par type a besoin d'une valeur de référence ; la liste étant triée du plus grand au plus petit, la première barre sert de 100 %.
+- **Limites :** pas de graphique temporel (délais, évolution), car les calculs de durée en JPQL dépendent de la base ; graphiques non interactifs.
 
 La refonte CSS améliore le socle et n'est pas comptée comme une fonctionnalité
 transverse du lot alpha.
@@ -545,7 +547,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F12, la visualisation du lot alpha et le déploiement restent à réaliser.
+Le déploiement reste à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -584,7 +586,7 @@ restent également à effectuer.
 - [x] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
 - [ ] Terminer F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
-- [ ] Réaliser et documenter les deux fonctions transverses.
+- [x] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
 - [x] Ajouter et justifier la requête native demandée.
 - [ ] Vérifier toutes les pages dans un navigateur sur ordinateur et mobile.

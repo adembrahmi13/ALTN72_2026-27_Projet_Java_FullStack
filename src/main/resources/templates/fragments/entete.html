@@ -8,6 +8,7 @@
     <nav aria-label="Navigation principale">
         <a th:href="@{/accueil}">Accueil</a>
         <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}">Tableau de bord</a>
+        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/statistiques}">Statistiques</a>
         <a th:href="@{/stations}">Stations et équipements</a>
         <a th:href="@{/incidents/historique}">Historique des incidents</a>
         <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/donnees/import}">Importer des données</a>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Statistiques</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p class="surtitre">Visualisation des données</p>
+    <h1>Statistiques</h1>
+
+    <!-- Graphique 1 : la largeur de la barre = note moyenne / 5 -->
+    <h2>Note moyenne des prestataires</h2>
+    <p th:if="${#lists.isEmpty(notesMoyennes)}" class="message-info">Aucun prestataire n'a encore été évalué.</p>
+    <ul class="graphique" th:unless="${#lists.isEmpty(notesMoyennes)}">
+        <li th:each="ligne : ${notesMoyennes}">
+            <span th:text="${ligne.nom}"></span>
+            <span class="fond-barre"><span class="barre" th:style="'width:' + ${ligne.moyenne * 100 / 5} + '%'"></span></span>
+            <span th:text="${#numbers.formatDecimal(ligne.moyenne, 1, 1) + ' / 5 (' + ligne.nombreEvaluations + ' évaluation(s))'}"></span>
+        </li>
+    </ul>
+
+    <!-- Graphique 2 : la liste est triée du plus grand au plus petit, la première barre sert donc de référence (100 %) -->
+    <h2>Incidents par type d'équipement</h2>
+    <p th:if="${#lists.isEmpty(incidentsParType)}" class="message-info">Aucun incident déclaré pour le moment.</p>
+    <ul class="graphique" th:unless="${#lists.isEmpty(incidentsParType)}">
+        <li th:each="ligne : ${incidentsParType}">
+            <span th:text="${ligne.type}"></span>
+            <span class="fond-barre"><span class="barre" th:style="'width:' + ${ligne.nombre * 100 / incidentsParType[0].nombre} + '%'"></span></span>
+            <span th:text="${ligne.nombre + ' incident(s)'}"></span>
+        </li>
+    </ul>
+</main>
+</body>
+</html>

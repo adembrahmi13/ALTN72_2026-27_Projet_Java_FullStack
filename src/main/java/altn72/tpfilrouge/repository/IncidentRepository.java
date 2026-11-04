@@ -41,6 +41,15 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
             """, nativeQuery = true)
     List<IncidentsActifsParStation> compterIncidentsActifsParStation();
 
+    // Lot alpha (visualisation) : nombre d'incidents par type d'équipement, le plus touché en premier
+    @Query("""
+            select e.type as type, count(i) as nombre
+            from Incident i join i.equipement e
+            group by e.type
+            order by count(i) desc, e.type
+            """)
+    List<IncidentsParType> compterIncidentsParType();
+
     // RG7 : historique trié par clôture, puis identifiant pour un ordre stable à date égale.
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
     List<Incident> findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc(String statut);
