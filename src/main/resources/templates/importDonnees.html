@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Importer des stations et équipements</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p class="surtitre">Gestion du réseau</p>
+    <h1>Importer des données CSV</h1>
+    <p class="introduction">Ajoutez plusieurs stations ou équipements à partir d'un fichier préparé dans votre tableur.
+        Importez d'abord les stations, puis leurs équipements.</p>
+    <p class="message-info" role="status" th:if="${messageSucces}" th:text="${messageSucces}"></p>
+    <p class="message-erreur" role="alert" th:if="${messageErreur}" th:text="${messageErreur}"></p>
+    <form th:action="@{/donnees/import}" method="post" enctype="multipart/form-data">
+        <label for="cible">Données à importer</label>
+        <select name="cible" id="cible" required>
+            <option value="stations" th:selected="${cible == null or cible == 'stations'}">Stations</option>
+            <option value="equipements" th:selected="${cible == 'equipements'}">Équipements</option>
+        </select>
+        <label for="fichier">Fichier CSV UTF-8</label>
+        <input type="file" name="fichier" id="fichier" accept=".csv,text/csv" required aria-describedby="format-csv">
+        <p id="format-csv">Séparateur : point-virgule. Maximum : 1 Mio et 5 000 lignes de données.</p>
+        <button type="submit">Importer le fichier</button>
+    </form>
+    <h2>Préparer votre fichier</h2>
+    <p><a th:href="@{/donnees/modeles/stations.csv}">Télécharger le modèle stations</a>
+        · <a th:href="@{/donnees/modeles/equipements.csv}">Télécharger le modèle équipements</a></p>
+    <p>Ouvrez un modèle dans votre tableur, remplacez les exemples puis enregistrez en CSV UTF-8
+        avec des points-virgules. Conservez les en-têtes et leur ordre.</p>
+    <dl>
+        <dt>Stations</dt><dd><code>nom</code> — nom obligatoire, 100 caractères maximum.</dd>
+        <dt>Équipements</dt><dd><code>reference;libelle;type;station;etat</code> — tous les champs sont obligatoires.
+            La station doit déjà exister et être identifiée sans ambiguïté par son nom.</dd>
+    </dl>
+    <p class="message-info">L'import ajoute des données, sans modifier les éléments existants.
+        Les doublons de nom de station ou de référence d'équipement sont refusés, sans distinction
+        de majuscules. Si une ligne est invalide, le fichier entier est annulé.</p>
+    <p><a th:href="@{/stations}">Consulter les stations et équipements</a></p>
+</main>
+</body>
+</html>

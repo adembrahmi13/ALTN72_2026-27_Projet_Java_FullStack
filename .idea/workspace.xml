@@ -4,27 +4,69 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d4d2069-84fe-43dc-9f5f-c7b177d8855a" name="Changes" comment="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4" />
+    <list default="true" id="5d4d2069-84fe-43dc-9f5f-c7b177d8855a" name="Changes" comment="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/journal.md" beforeDir="false" afterPath="$PROJECT_DIR$/journal.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_A:/EFREI/COURS/S7/Fullstack java/Projet_java_FullStack" value="3LPLkUdMXzRwTBTNxxty2o9sWL4" />
+    </persistenceIdMap>
   </component>
   <component name="DatabaseLocalColorSettings">
     <colors>
       <entry key="23a49601-4d8f-4857-8251-e6b25e3001b3" value="" />
     </colors>
   </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="82" />
+  </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
+        <option value="CSS File" />
         <option value="Class" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="feat/Consulter_l’historique_des_incidents_résolus" />
+        <entry key="$PROJECT_DIR$" value="develop" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;adembrahmi13&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/adembrahmi13/ALTN72_2026-27_Projet_Java_FullStack.git&quot;,
+    &quot;accountId&quot;: &quot;603fd21e-63a9-4409-919d-61a89a9ae0e9&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$MAVEN_REPOSITORY$/org/hibernate/orm/hibernate-core/7.4.5.Final/hibernate-core-7.4.5.Final-sources.jar!/org/hibernate/service/spi/ServiceException.java" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="HttpClientEndpointsTabState">
+    <option name="cachedRequestData" value="&lt;CachedHttpClientTabRequests&gt;&#10;  &lt;entry key=&quot;ef7067bd7bcfd2f9f318119744a8c109a508f49c&quot; value=&quot;###&amp;#10;GET http://localhost:8080/connexion&quot; /&gt;&#10;&lt;/CachedHttpClientTabRequests&gt;" />
   </component>
   <component name="HttpClientOnboardingState">{
   &quot;isOnboardingCommentShown&quot;: true
@@ -36,17 +78,98 @@
       </MavenGeneralSettings>
     </option>
   </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.3724409386833467" />
+      <entry key="MS500" value="3.3239355057488282" />
+      <entry key="S2" value="6.547333659977597" />
+      <entry key="S5" value="8.553870295894377" />
+      <entry key="S10" value="13.499515404176265" />
+      <entry key="S30" value="29.917838915126268" />
+      <entry key="S60" value="43.48605764013578" />
+      <entry key="M2" value="71.54341740176147" />
+      <entry key="M5" value="175.8113926992945" />
+      <entry key="M10" value="322.84191134630333" />
+      <entry key="M15" value="451.2788390838448" />
+      <entry key="M30" value="784.808329761375" />
+      <entry key="H1" value="1249.1022753201937" />
+      <entry key="H2" value="1728.4308695695452" />
+      <entry key="H4" value="2104.715827867417" />
+      <entry key="D1" value="2536.2967684518308" />
+      <entry key="W1" value="2624.7720743943696" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.3074478559339031" />
+      <entry key="MS500" value="3.2918765159484025" />
+      <entry key="S2" value="6.531316419973015" />
+      <entry key="S5" value="8.545492660594427" />
+      <entry key="S10" value="13.493013543824077" />
+      <entry key="S30" value="29.9131433193469" />
+      <entry key="S60" value="43.48263679344251" />
+      <entry key="M2" value="71.54051095317674" />
+      <entry key="M5" value="175.8082386879719" />
+      <entry key="M10" value="322.838735528728" />
+      <entry key="M15" value="451.27565136084075" />
+      <entry key="M30" value="784.8051187337392" />
+      <entry key="H1" value="1249.099401947738" />
+      <entry key="H2" value="1728.4287357731234" />
+      <entry key="H4" value="2104.7144772913434" />
+      <entry key="D1" value="2536.2964876794176" />
+      <entry key="W1" value="2624.7720326292656" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1,
   &quot;fromUser&quot;: false
 }</component>
   <component name="ProjectId" id="3JfyIL1FJXtxsMKHIR8OQsBvZNj" />
+  <component name="ProjectSessionTemplates">
+    <option name="panelTemplate">
+      <template>
+        <option name="ensembleEnabled" value="false" />
+        <option name="modeId" value="Agent" />
+        <option name="model">
+          <model>
+            <option name="modelType" value="builtin_id" />
+            <option name="modelValue" value="auto" />
+          </model>
+        </option>
+        <option name="targetType" value="BACKGROUND" />
+        <option name="worktreeMode" value="WORKSPACE" />
+      </template>
+    </option>
+    <option name="version" value="1" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
     "HTTP Request.generated-requests | #10.executor": "Run",
     "HTTP Request.generated-requests | #11.executor": "Run",
     "HTTP Request.generated-requests | #14.executor": "Run",
@@ -58,20 +181,30 @@
     "RequestMappingsPanelOrder1": "1",
     "RequestMappingsPanelWidth0": "75",
     "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.TpFilRougeApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "master",
+    "copilot.chat.legacySessionMetadata.migrated": "true",
+    "git-widget-placeholder": "feat/expose__api__rest",
     "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
     "last_opened_file_path": "P:/MES COURS/Developpement Full Stack avec Java/ALTN72 - 2026_2027/DEV_CODE/GitHub/TpFilRouge_CORRIGE_5",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices"
+    "settings.editor.selected.configurable": "preferences.keymap",
+    "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
@@ -119,19 +252,30 @@
       <method v="2" />
     </configuration>
     <configuration name="TpFilRougeApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <envs>
+        <env name="DEMO_MOT_DE_PASSE" value="VotreMotDePasseDeDemo" />
+      </envs>
       <module name="TpFilRouge" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="altn72.tpfilrouge.TpFilRougeApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="HTTP Request.generated-requests | #7" />
+      <item itemvalue="HTTP Request.generated-requests | #8" />
+      <item itemvalue="HTTP Request.generated-requests | #9" />
+      <item itemvalue="HTTP Request.generated-requests | #11" />
+      <item itemvalue="HTTP Request.generated-requests | #14" />
+      <item itemvalue="Spring Boot.TpFilRougeApplication" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="HTTP Request.generated-requests | #14" />
+        <item itemvalue="HTTP Request.generated-requests | #11" />
         <item itemvalue="HTTP Request.generated-requests | #9" />
         <item itemvalue="HTTP Request.generated-requests | #8" />
         <item itemvalue="HTTP Request.generated-requests | #7" />
-        <item itemvalue="HTTP Request.generated-requests | #11" />
       </list>
     </recent_temporary>
   </component>
@@ -139,8 +283,12 @@
     <attachedChunks>
       <set>
         <option value="bundled-jdk-30f59d01ecdd-a203e0a19954-intellij.indexing.shared.core-IU-262.10968.63" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-IU-262.10968.63" />
       </set>
     </attachedChunks>
+  </component>
+  <component name="StructureViewState">
+    <option name="selectedTab" value="Logical" />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -149,6 +297,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1790066336942</updated>
+      <workItem from="1791798064497" duration="1756000" />
+      <workItem from="1791961655713" duration="12356000" />
+      <workItem from="1793036860384" duration="4891000" />
+      <workItem from="1793348878172" duration="913000" />
+      <workItem from="1793350900653" duration="2081000" />
+      <workItem from="1793357510840" duration="2526000" />
+      <workItem from="1793366506661" duration="7950000" />
+      <workItem from="1793732769815" duration="5148000" />
+      <workItem from="1793813999637" duration="4581000" />
     </task>
     <servers />
   </component>
@@ -159,5 +316,9 @@
     <MESSAGE value="Dev Full Stack Java / 2026-27&#10;Corrigé TP 1-2" />
     <MESSAGE value="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4" />
     <option name="LAST_COMMIT_MESSAGE" value="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

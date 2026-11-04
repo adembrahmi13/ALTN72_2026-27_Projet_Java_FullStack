@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Évaluer le prestataire</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p><a th:href="@{/incidents/{id}(id=${incident.id})}">← Détail de l'incident</a></p>
+    <h1>Évaluer l'intervention sur l'incident n° <span th:text="${incident.id}"></span></h1>
+    <p>Prestataire : <strong th:text="${incident.prestataire.nom}"></strong></p>
+    <p class="message-info">Une seule évaluation est possible par incident.</p>
+    <form th:action="@{/incidents/{id}/evaluer(id=${incident.id})}" th:object="${saisieEvaluation}" method="post">
+        <label for="note">Note (de 1 à 5)</label>
+        <input type="number" th:field="*{note}" min="1" max="5" required>
+        <p class="message-erreur" th:if="${#fields.hasErrors('note')}" th:errors="*{note}"></p>
+        <label for="commentaire">Commentaire (facultatif)</label>
+        <textarea th:field="*{commentaire}" rows="4" maxlength="255"></textarea>
+        <p class="message-erreur" th:if="${#fields.hasErrors('commentaire')}" th:errors="*{commentaire}"></p>
+        <button type="submit">Enregistrer l'évaluation</button>
+        <a class="bouton-secondaire" th:href="@{/incidents/{id}(id=${incident.id})}">Annuler</a>
+    </form>
+</main>
+</body>
+</html>

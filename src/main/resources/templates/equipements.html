@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Équipements de la station</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+
+<main>
+    <p><a th:href="@{/stations}">← Toutes les stations</a></p>
+    <h1>Équipements — <span th:text="${station.nom}">Station</span></h1>
+
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Tableau défilant" th:unless="${#lists.isEmpty(equipements)}"><table>
+        <thead>
+        <tr>
+            <th scope="col">Référence</th>
+            <th scope="col">Libellé</th>
+            <th scope="col">Type</th>
+            <th scope="col">État de fonctionnement</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="equipement : ${equipements}">
+            <td><a th:href="@{/equipements/{id}(id=${equipement.id})}" th:text="${equipement.referenceUnique}">Référence</a></td>
+            <td th:text="${equipement.libelleDescription}"></td>
+            <td th:text="${equipement.type}"></td>
+            <td th:text="${equipement.etatFonctionnement}"></td>
+        </tr>
+        </tbody>
+    </table></div>
+    <p th:if="${#lists.isEmpty(equipements)}">Aucun équipement dans cette station.</p>
+</main>
+</body>
+</html>

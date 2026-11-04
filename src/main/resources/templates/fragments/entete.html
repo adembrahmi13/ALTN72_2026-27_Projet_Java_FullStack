@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<header th:fragment="entete" sec:authorize="isAuthenticated()" class="entete-utilisateur">
+    <a class="marque" th:href="@{/accueil}" aria-label="Guardian, accueil"><span class="marque-symbole" aria-hidden="true">G</span> Guardian</a>
+    <nav aria-label="Navigation principale">
+        <a th:href="@{/accueil}">Accueil</a>
+        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}">Tableau de bord</a>
+        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/statistiques}">Statistiques</a>
+        <a th:href="@{/stations}">Stations et équipements</a>
+        <a th:href="@{/incidents/historique}">Historique des incidents</a>
+        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/donnees/import}">Importer des données</a>
+    </nav>
+    <div class="compte-utilisateur">
+    <span class="identite-utilisateur">
+        Bonjour <span th:text="${#authentication.principal.prenom}">Prénom</span>
+        (<span th:text="${#authentication.principal.profil.libelle}">Profil</span>)
+    </span>
+    <form th:action="@{/deconnexion}" method="post" class="formulaire-deconnexion">
+        <button type="submit" class="lien">Déconnectez-vous</button>
+    </form>
+    </div>
+</header>
+</body>
+</html>
