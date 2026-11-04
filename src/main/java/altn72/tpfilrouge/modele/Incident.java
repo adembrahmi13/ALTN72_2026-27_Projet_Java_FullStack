@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class Incident {
     public static final String STATUT_NON_AFFECTE = "Non affecté";
     public static final String STATUT_RESOLU = "Résolu";
+    public static final String STATUT_AFFECTE = "Affecté";
 
     // Pour dire a JPA que l'attribut id est la clé primaire et qu'il est auto-incrémenté
     @Id

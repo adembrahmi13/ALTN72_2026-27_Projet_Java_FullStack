@@ -25,6 +25,13 @@ public class GestionnaireExceptionsWeb {
         return VUE_ERREUR;
     }
 
+    @ExceptionHandler(AffectationIncidentInterditeException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String gererAffectationInterdite(AffectationIncidentInterditeException exception, Model model) {
+        model.addAttribute("message", exception.getMessage());
+        return VUE_ERREUR;
+    }
+
     @ExceptionHandler(ModificationIncidentInterditeException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String gererModificationInterdite(ModificationIncidentInterditeException exception, Model model) {

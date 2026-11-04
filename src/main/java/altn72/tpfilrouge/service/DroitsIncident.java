@@ -24,6 +24,10 @@ public class DroitsIncident {
         return possedeRole("RESPONSABLE_EXPLOITATION") && peutModifier(incident);
     }
 
+    public boolean peutAffecter(Incident incident) {
+        return peutResoudre(incident);
+    }
+
     public boolean peutChangerEquipement(Incident incident) {
         return peutModifier(incident) && possedeRole("RESPONSABLE_EXPLOITATION")
                 && incident.getPrestataireId() == null
