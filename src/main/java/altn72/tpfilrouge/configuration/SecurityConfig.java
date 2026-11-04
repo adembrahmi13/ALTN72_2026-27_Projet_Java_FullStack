@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .loginProcessingUrl(PAGE_CONNEXION)
                         .usernameParameter("login")
                         .passwordParameter("motDePasse")
-                        .defaultSuccessUrl("/accueil", true) //mettre le chemin du tableau de bord plus tard
+                        .defaultSuccessUrl("/accueil", true)
                         .failureUrl(PAGE_CONNEXION + "?erreur"))
                 .logout(deconnexion -> deconnexion
                         .logoutUrl(URL_DECONNEXION)
