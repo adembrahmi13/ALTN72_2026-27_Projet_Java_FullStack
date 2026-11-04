@@ -61,8 +61,8 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **Déploiement :** aucune URL fournie à ce stade.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
-- **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F11 et F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
+- **Dates :** les incidents historiques restent datés de juin 2026 ; les incidents actifs du tableau de bord sont générés relativement à l'exécution du script (`NOW() - INTERVAL 47/48/72 HOUR`) pour couvrir les seuils de RG3.
+- **Limites :** F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils ; F7 permet au responsable d'affecter puis de réaffecter un prestataire à un incident non résolu. F10 permet au responsable d'évaluer le prestataire d'un incident résolu ; la note est consultable dans le détail de l'incident (F5).
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -140,6 +140,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
 | F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
 | F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
+| F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué | `TableauDeBordTest` | 7 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
@@ -153,11 +154,11 @@ et les durées exactes en jours, heures et minutes.
 | Comportement | Situation |
 | --- | --- |
 | Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
-| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
-| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7 et F8 réalisées et testées ; F11 reste à réaliser |
+| Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | Calcul dans `TableauDeBordService` avec horloge injectée, seuils testés à la minute près |
+| Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F7, F8 et F11 réalisées et testées |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Règles RG8 appliquées dans `EvaluationService` et testées |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
-| Restrictions de la future fonction F11 (RG11) | Restrictions F6, F7, F8 et F10 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
+| Restrictions par profil (RG11) | Restrictions F6, F7, F8, F10 et F11 testées |
 | API incidents et agrégations graphiques | Fonctionnalités absentes |
 | Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB | Tests sur H2 uniquement |
@@ -196,8 +197,7 @@ fournit les rôles. `@EnableMethodSecurity` active `@PreAuthorize` sur les méth
 de préparation et d'enregistrement F6 : seuls les deux profils métier y accèdent.
 `DroitsIncident` contrôle les champs autorisés à partir du contexte de sécurité,
 sans accepter de profil transmis par le formulaire. Ces règles sont utilisées par
-le service et l'interface. F7, F8 et F10 sont également protégées au service ; la restriction
-F11 reste à appliquer à leurs futures routes.
+le service et l'interface. F7, F8, F10 et F11 sont également protégées au service.
 
 ### Modification des informations autorisées — F6
 
@@ -406,7 +406,7 @@ pages programmeurs auparavant liées au CDN Bootstrap.
 - Respect de `prefers-reduced-motion` et polices système sans chargement externe.
 
 La couleur d'erreur ne représente pas une urgence d'incident.
-Le calcul des indicateurs et les constantes 48 h / 72 h de F11 restent à développer.
+Les seuils 48 h / 72 h sont les constantes `SEUIL_ORANGE_HEURES` et `SEUIL_ROUGE_HEURES` de `TableauDeBordService`, seul endroit où elles sont définies. Le niveau d'attention (`NiveauAttention`) est recalculé à chaque affichage avec l'heure courante, jamais enregistré en base.
 Les tests valident les templates et parcours couverts ; la vérification visuelle
 dans un navigateur reste à effectuer.
 
@@ -525,7 +525,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F11 et F12, la visualisation du lot alpha et le déploiement restent à réaliser.
+F12, la visualisation du lot alpha et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -550,7 +550,7 @@ restent également à effectuer.
 | F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
 | F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
 | F10 Évaluer un prestataire | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés |
-| F11 Tableau de bord | Non réalisé |
+| F11 Tableau de bord | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau, 7 tests dédiés |
 | F12 API incidents + Swagger | Non réalisée |
 | Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
 | Lot alpha 2 : graphiques | Non réalisé |
@@ -561,8 +561,8 @@ restent également à effectuer.
 
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
-- [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F11 et F12 et vérifier RG1 à RG11.
+- [x] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
+- [ ] Terminer F12 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).

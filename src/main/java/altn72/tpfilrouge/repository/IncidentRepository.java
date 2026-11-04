@@ -24,6 +24,10 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
     // RG7 : les incidents d'un équipement sont ordonnés selon la date d'ouverture (le plus récent en premier)
     List<Incident> findByEquipement_IdOrderByDateHeureOuvertureDesc(Integer equipementId);
 
+    // RG6 : incidents actifs (non résolus) pour le tableau de bord, le plus ancien en premier
+    @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
+    List<Incident> findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc();
+
     // RG7 : historique trié par clôture, puis identifiant pour un ordre stable à date égale.
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
     List<Incident> findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc(String statut);

@@ -81,6 +81,16 @@ INSERT INTO incident (equipement_id, description, date_heure_ouverture, statut, 
                                                                                                                            (2, 'Blocage mécanique du portique gauche', '2026-06-01 08:30:00', 'Résolu', 1, '2026-06-01 10:15:00'),
                                                                                                                            (1, 'Écran tactile figé', '2026-06-02 14:00:00', 'En cours', 2, NULL);
 
+-- 4 bis. Incidents actifs pour le tableau de bord (F11)
+-- Dates relatives à l'exécution du script pour couvrir les seuils de RG3 (47 h, 48 h, 72 h)
+-- NOW() doit être à l'heure de l'application (Paris), sinon les seuils sont décalés d'une heure
+SET time_zone = 'Europe/Paris';
+INSERT INTO incident (equipement_id, description, date_heure_ouverture, statut, prestataire_id, date_heure_resolution) VALUES
+    (3, 'Borne d information éteinte', NOW() - INTERVAL 47 HOUR, 'Non affecté', NULL, NULL),
+    (1, 'Monnayeur bloqué', NOW() - INTERVAL 48 HOUR, 'Non affecté', NULL, NULL),
+    (2, 'Portique ne lit plus les badges', NOW() - INTERVAL 72 HOUR, 'Non affecté', NULL, NULL),
+    (3, 'Affichage partiel de la borne', NOW() - INTERVAL 80 HOUR, 'Affecté', 1, NULL);
+
 -- 5. Insertion dans la table evaluation
 INSERT INTO evaluation (incident_id, note, commentaire, date) VALUES
     (1, 5, 'Intervention rapide et efficace.', '2026-06-01');

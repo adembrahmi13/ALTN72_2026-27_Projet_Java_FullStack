@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tableau de bord</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p class="surtitre">Supervision</p>
+    <h1>Tableau de bord des incidents actifs</h1>
+
+    <!-- Indicateurs synthétiques -->
+    <ul class="compteurs">
+        <li th:each="niveau : ${niveaux}">
+            <span class="niveau" th:classappend="${'niveau-' + niveau.name()}" th:text="${niveau.libelle}"></span>
+            <strong th:text="${compteurs.get(niveau)}"></strong>
+        </li>
+    </ul>
+
+    <!-- Filtres : station et niveau d'attention -->
+    <form th:action="@{/tableau-de-bord}" method="get">
+        <label for="stationId">Station</label>
+        <select id="stationId" name="stationId">
+            <option value="">Toutes les stations</option>
+            <option th:each="station : ${stations}" th:value="${station.id}" th:text="${station.nom}"
+                    th:selected="${station.id == stationChoisie}"></option>
+        </select>
+        <label for="niveau">Niveau d'attention</label>
+        <select id="niveau" name="niveau">
+            <option value="">Tous les niveaux</option>
+            <option th:each="niveau : ${niveaux}" th:value="${niveau.name()}" th:text="${niveau.libelle}"
+                    th:selected="${niveau == niveauChoisi}"></option>
+        </select>
+        <button type="submit">Filtrer</button>
+        <a class="bouton-secondaire" th:href="@{/tableau-de-bord}">Réinitialiser</a>
+    </form>
+
+    <p th:if="${#lists.isEmpty(incidents)}" class="message-info">Aucun incident actif pour ces critères.</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Incidents actifs"
+         th:unless="${#lists.isEmpty(incidents)}">
+        <table>
+            <caption>Incidents non résolus, du plus ancien au plus récent</caption>
+            <thead>
+            <tr>
+                <th scope="col">Niveau</th>
+                <th scope="col">Incident</th>
+                <th scope="col">Équipement</th>
+                <th scope="col">Station</th>
+                <th scope="col">Ouvert depuis</th>
+                <th scope="col">Prestataire</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ligne : ${incidents}">
+                <td><span class="niveau" th:classappend="${'niveau-' + ligne.niveau.name()}"
+                          th:text="${ligne.niveau.libelle}"></span></td>
+                <td><a th:href="@{/incidents/{id}(id=${ligne.incident.id})}" th:text="${ligne.incident.description}"></a></td>
+                <td><a th:href="@{/equipements/{id}(id=${ligne.incident.equipement.id})}"
+                       th:text="${ligne.incident.equipement.referenceUnique}"></a></td>
+                <td th:text="${ligne.incident.equipement.station.nom}"></td>
+                <td th:text="${ligne.dureeOuverture}"></td>
+                <td th:text="${ligne.incident.prestataire != null ? ligne.incident.prestataire.nom : 'En attente d''affectation'}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
