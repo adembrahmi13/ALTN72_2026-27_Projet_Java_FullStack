@@ -43,6 +43,18 @@
         <dt>Nom</dt><dd th:text="${incident.prestataire.nom}"></dd>
         <dt>Contact</dt><dd th:text="${incident.prestataire.contact}"></dd>
     </dl>
+    <section th:if="${affectationAutorisee}">
+        <h3 th:text="${incident.prestataireId == null ? 'Affecter un prestataire' : 'Réaffecter un prestataire'}"></h3>
+        <form th:action="@{/incidents/{id}/affecter-prestataire(id=${incident.id})}" method="post">
+            <label for="prestataireId">Choisir un prestataire :</label>
+            <select id="prestataireId" name="prestataireId" required>
+                <option value="">-- Sélectionner --</option>
+                <option th:each="prestataire : ${prestataires}" th:value="${prestataire.id}"
+                        th:text="${prestataire.nom}" th:selected="${prestataire.id == incident.prestataireId}"></option>
+            </select>
+            <button type="submit">Confirmer l'affectation</button>
+        </form>
+    </section>
     <h2>Évaluation</h2>
     <p th:if="${detail.evaluation == null}">Aucune évaluation.</p>
     <dl th:if="${detail.evaluation != null}">
