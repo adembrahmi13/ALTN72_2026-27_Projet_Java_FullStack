@@ -1,14 +1,14 @@
 package altn72.tpfilrouge.service;
 
-import org.springframework.stereotype.Service;
-import altn72.tpfilrouge.repository.IncidentRepository;
-import altn72.tpfilrouge.repository.PrestataireRepository;
-import org.springframework.transaction.annotation.Transactional;
-
+import altn72.tpfilrouge.exception.AffectationIncidentInterditeException;
+import altn72.tpfilrouge.exception.RessourceIntrouvableException;
 import altn72.tpfilrouge.modele.Incident;
 import altn72.tpfilrouge.modele.Prestataire;
-
-// Fichier pour gérér les affectations aux prestataires
+import altn72.tpfilrouge.repository.IncidentRepository;
+import altn72.tpfilrouge.repository.PrestataireRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AffectationPrestataireService {
@@ -21,24 +21,18 @@ public class AffectationPrestataireService {
         this.prestataireRepository = prestataireRepository;
     }
 
+    // RG5 : un incident résolu ne peut plus être affecté ni réaffecté
     @Transactional
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
     public void affecterPrestataire(Integer incidentId, Integer prestataireId) {
-
         Incident incident = incidentRepository.findById(incidentId)
-            .orElseThrow(() -> new IllegalArgumentException("Incident introuvable : " + incidentId));
-
+                .orElseThrow(() -> new RessourceIntrouvableException("Incident", incidentId));
         Prestataire prestataire = prestataireRepository.findById(prestataireId)
-            .orElseThrow(() -> new IllegalArgumentException("Prestataire introuvable : " + prestataireId));
-
-        if (incident.getDateHeureResolution() != null || "Résolu".equalsIgnoreCase(incident.getStatut())) {
-            throw new IllegalStateException(
-                "Impossible d'affecter un prestataire à un incident résolu."
-            );
+                .orElseThrow(() -> new RessourceIntrouvableException("Prestataire", prestataireId));
+        if (incident.getDateHeureResolution() != null || Incident.STATUT_RESOLU.equals(incident.getStatut())) {
+            throw new AffectationIncidentInterditeException("Impossible d'affecter un prestataire à un incident résolu.");
         }
-
         incident.setPrestataireId(prestataire.getId());
         incident.setStatut(Incident.STATUT_AFFECTE);
-        incidentRepository.save(incident);
     }
-
 }

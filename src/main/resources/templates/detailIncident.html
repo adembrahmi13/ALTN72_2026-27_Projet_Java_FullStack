@@ -58,10 +58,7 @@
         <dt>Contact</dt>
         <dd th:text="${incident.prestataire.contact}"></dd>
       </dl>
-      <section
-        th:if="${incident.dateHeureResolution == null
-                 and incident.statut != 'Résolu'}"
-      >
+      <section th:if="${affectationAutorisee}">
         <h3
           th:text="${incident.prestataireId == null
                    ? 'Affecter un prestataire'

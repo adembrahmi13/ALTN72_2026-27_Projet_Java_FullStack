@@ -23,9 +23,5 @@ public class Prestataire {
     public Integer getId() { return id; }
     public String getNom() { return nom; }
     public String getContact() { return contact; }
-
-    public void setId(Integer id) { this.id = id; }
-    public void setNom(String nom) { this.nom = nom; }
-    public void setContact(String contact) { this.contact = contact; }
 }
 
