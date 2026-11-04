@@ -20,6 +20,12 @@
         </li>
     </ul>
 
+    <p th:unless="${#lists.isEmpty(incidentsParStation)}">Incidents actifs par station :
+        <span th:each="ligne, etat : ${incidentsParStation}">
+            <strong th:text="${ligne.nom}"></strong> <span th:text="${ligne.nombre}"></span><span th:unless="${etat.last}"> · </span>
+        </span>
+    </p>
+
     <!-- Filtres : station et niveau d'attention -->
     <form th:action="@{/tableau-de-bord}" method="get">
         <label for="stationId">Station</label>

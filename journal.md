@@ -140,7 +140,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
 | F7 | Affectation puis réaffectation, incident résolu refusé (409), agent refusé par URL et formulaire masqué, incident ou prestataire inexistant en 404 | `AffectationPrestataireTest` | 4 |
 | F10 | Évaluation enregistrée avec date serveur, incident non résolu ou sans prestataire refusé (409), une seule évaluation par incident, note 0/6/vide refusée par le formulaire, agent refusé par URL et lien masqué, 404 | `EvaluationPrestataireTest` | 7 |
-| F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué | `TableauDeBordTest` | 7 |
+| F11 | 47 h et 47 h 59 vert, 48 h et 71 h 59 orange, 72 h rouge, affecté distinct même très ancien, résolu absent, filtres station + niveau, agent refusé (403) et lien masqué, niveau invalide dans l'URL (400), comptage par station (requête native) | `TableauDeBordTest` | 9 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
@@ -348,14 +348,34 @@ et SQL. `EvaluationService` vérifie RG8 avant l'enregistrement (incident résol
 | `IncidentRepository.findByEquipement_IdOrderByDateHeureOuvertureDesc` | Incidents d'un équipement, récents en premier |
 | `IncidentRepository.findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc` | Historique F9 : statut résolu, date de clôture présente, tri par clôture puis identifiant décroissants |
 | `EvaluationRepository.findByIncident_Id` | Évaluation éventuelle |
+| `EvaluationRepository.existsByIncident_Id` | F10 : refuser une seconde évaluation (RG8) |
+| `IncidentRepository.findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc` | F11 : incidents actifs, du plus ancien au plus récent (RG6) |
 | `UtilisateurRepository.findByLogin` | Utilisateur pour authentification |
 
 **JPQL explicite :** `IncidentRepository.trouverPourResolution` sélectionne l'incident
 par identifiant avec `@Query` et un verrou d'écriture pour protéger la clôture.
-**SQL natif dans un repository :** absent ; exigence restant à satisfaire.
-Le script d'initialisation ne remplace pas cette exigence. Le futur choix devra
-comparer JPQL et SQL natif, justifier le besoin MariaDB, étudier portabilité
-et maintenance, et employer des paramètres liés.
+**Requête SQL native (unique) :** `IncidentRepository.compterIncidentsActifsParStation`,
+utilisée par l'indicateur « incidents actifs par station » du tableau de bord F11.
+Elle joint `incident`, `equipement` et `station`, garde les incidents sans date de
+résolution (RG6), puis compte par station avec `GROUP BY`. Le résultat est lu via
+l'interface de projection `IncidentsActifsParStation` (alias `nom` et `nombre`).
+
+*Analyse critique :*
+- **Ce qu'on y gagne :** la base fait l'agrégation et ne renvoie qu'une ligne par
+  station, au lieu de charger tous les incidents en mémoire pour les compter en Java.
+  Le SQL est lisible tel quel et peut être testé directement dans un client MariaDB.
+- **Ce qu'on y perd :** la requête porte sur les noms de **tables et colonnes**
+  (`date_heure_resolution`, `station_id`) et non sur les entités. Renommer un attribut
+  ou une colonne ne provoque aucune erreur de compilation : l'erreur n'apparaît qu'à
+  l'exécution. Aucune vérification au démarrage, contrairement au JPQL.
+- **Portabilité :** seul du SQL standard est utilisé (`JOIN`, `COUNT`, `GROUP BY`) ;
+  la requête fonctionne sur MariaDB et sur H2 (tests). Une syntaxe propre à MariaDB
+  l'aurait rendue intestable avec H2.
+- **Sécurité :** aucun paramètre n'est concaténé (la requête n'en a pas) ; un paramètre
+  futur devrait être lié (`:parametre`) pour éviter l'injection SQL.
+- **Conclusion :** ici, JPQL aurait suffi (`select new ...` avec `group by`). Le natif
+  est acceptable pour une agrégation simple et isolée, mais nous le limitons à cette
+  seule requête : pour le reste, les requêtes dérivées et JPQL restent plus sûres.
 
 **Script :** `src/main/resources/schema.sql`, ordre de création de station corrigé
 et unicité de l'évaluation ajoutée. Les tests H2 génèrent le schéma depuis les
@@ -550,7 +570,7 @@ restent également à effectuer.
 | F8 Résoudre un incident | Réalisée ; responsable uniquement, heure serveur, 10 tests dédiés |
 | F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
 | F10 Évaluer un prestataire | Réalisée ; responsable uniquement, RG8 vérifiée au service, 7 tests dédiés |
-| F11 Tableau de bord | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau, 7 tests dédiés |
+| F11 Tableau de bord | Réalisé ; responsable uniquement, niveaux RG3/RG4, filtres station et niveau, compteurs par niveau et par station, 9 tests dédiés |
 | F12 API incidents + Swagger | Non réalisée |
 | Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
 | Lot alpha 2 : graphiques | Non réalisé |
@@ -566,7 +586,7 @@ restent également à effectuer.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
-- [ ] Ajouter et justifier la requête native demandée.
+- [x] Ajouter et justifier la requête native demandée.
 - [ ] Vérifier toutes les pages dans un navigateur sur ordinateur et mobile.
 - [ ] Nettoyer les restes du TP, commentaires obsolètes et traces console.
 - [ ] Harmoniser la version Java du POM.

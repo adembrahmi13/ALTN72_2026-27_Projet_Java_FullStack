@@ -3,6 +3,7 @@ package altn72.tpfilrouge.service;
 import altn72.tpfilrouge.modele.Incident;
 import altn72.tpfilrouge.modele.NiveauAttention;
 import altn72.tpfilrouge.repository.IncidentRepository;
+import altn72.tpfilrouge.repository.IncidentsActifsParStation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,5 +79,12 @@ public class TableauDeBordService {
             compteurs.put(incidentActif.niveau(), compteurs.get(incidentActif.niveau()) + 1);
         }
         return compteurs;
+    }
+
+    // Indicateur synthétique : nombre d'incidents actifs par station (requête SQL native)
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('RESPONSABLE_EXPLOITATION')")
+    public List<IncidentsActifsParStation> compterIncidentsActifsParStation() {
+        return incidentRepository.compterIncidentsActifsParStation();
     }
 }

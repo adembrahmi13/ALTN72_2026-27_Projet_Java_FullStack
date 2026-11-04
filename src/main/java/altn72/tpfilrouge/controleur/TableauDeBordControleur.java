@@ -26,6 +26,7 @@ public class TableauDeBordControleur {
                                         Model model) {
         model.addAttribute("incidents", tableauDeBordService.listerIncidentsActifs(stationId, niveau));
         model.addAttribute("compteurs", tableauDeBordService.compterParNiveau());
+        model.addAttribute("incidentsParStation", tableauDeBordService.compterIncidentsActifsParStation());
         model.addAttribute("stations", stationService.listerStations());
         model.addAttribute("niveaux", NiveauAttention.values());
         model.addAttribute("stationChoisie", stationId);

@@ -7,6 +7,7 @@ import altn72.tpfilrouge.modele.Prestataire;
 import altn72.tpfilrouge.modele.Station;
 import altn72.tpfilrouge.repository.EquipementRepository;
 import altn72.tpfilrouge.repository.IncidentRepository;
+import altn72.tpfilrouge.repository.IncidentsActifsParStation;
 import altn72.tpfilrouge.repository.PrestataireRepository;
 import altn72.tpfilrouge.repository.StationRepository;
 import altn72.tpfilrouge.service.IncidentActif;
@@ -125,6 +126,24 @@ class TableauDeBordTest {
         mvc.perform(get("/tableau-de-bord").param("stationId", station.getId().toString()).param("niveau", "ROUGE"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("/incidents/" + rouge.getId())));
+    }
+
+    @Test
+    void compteLesIncidentsActifsParStationAvecLaRequeteNative() {
+        incidentOuvertDepuis(60);
+        incidentOuvertDepuis(120);
+        Incident resolu = incidentOuvertDepuis(180);
+        resolu.setStatut(Incident.STATUT_RESOLU);
+        resolu.setDateHeureResolution(MAINTENANT);
+        incidents.flush();
+
+        Long nombre = null;
+        for (IncidentsActifsParStation ligne : service.compterIncidentsActifsParStation()) {
+            if (ligne.getNom().equals("Station F11")) {
+                nombre = ligne.getNombre();
+            }
+        }
+        assertEquals(2L, nombre);
     }
 
     @Test

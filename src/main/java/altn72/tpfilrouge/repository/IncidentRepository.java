@@ -28,6 +28,19 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
     List<Incident> findByDateHeureResolutionIsNullOrderByDateHeureOuvertureAscIdAsc();
 
+    // Seule requête SQL native du projet (voir journal.md, section Persistance) :
+    // nombre d'incidents actifs par station, pour les indicateurs du tableau de bord
+    @Query(value = """
+            SELECT s.nom AS nom, COUNT(i.id) AS nombre
+            FROM incident i
+            JOIN equipement e ON e.id = i.equipement_id
+            JOIN station s ON s.id = e.station_id
+            WHERE i.date_heure_resolution IS NULL
+            GROUP BY s.id, s.nom
+            ORDER BY nombre DESC, s.nom
+            """, nativeQuery = true)
+    List<IncidentsActifsParStation> compterIncidentsActifsParStation();
+
     // RG7 : historique trié par clôture, puis identifiant pour un ordre stable à date égale.
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
     List<Incident> findByStatutAndDateHeureResolutionIsNotNullOrderByDateHeureResolutionDescIdDesc(String statut);
