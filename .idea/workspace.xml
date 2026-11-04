@@ -8,13 +8,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/journal.md" beforeDir="false" afterPath="$PROJECT_DIR$/journal.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/exception/GestionnaireExceptionsWeb.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/exception/GestionnaireExceptionsWeb.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/EquipementRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/EquipementRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/StationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/StationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/historiqueIncidents.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/historiqueIncidents.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,23 +84,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.0000000000000009" />
-      <entry key="MS500" value="1.0028163953632752" />
-      <entry key="S2" value="2.6528640881840744" />
-      <entry key="S5" value="9.171091812373163" />
-      <entry key="S10" value="19.89665550736883" />
-      <entry key="S30" value="42.91597947104728" />
-      <entry key="S60" value="59.08964370433041" />
-      <entry key="M2" value="76.26010184942065" />
-      <entry key="M5" value="113.95477334106876" />
-      <entry key="M10" value="217.64772845471097" />
-      <entry key="M15" value="334.12323514617" />
-      <entry key="M30" value="636.7801810159885" />
-      <entry key="H1" value="1029.9911335971453" />
-      <entry key="H2" value="1413.4334087608215" />
-      <entry key="H4" value="1704.0143172316898" />
-      <entry key="D1" value="2029.011092462381" />
-      <entry key="W1" value="2094.7193045225627" />
+      <entry key="MS100" value="1.3724409386833467" />
+      <entry key="MS500" value="3.3239355057488282" />
+      <entry key="S2" value="6.547333659977597" />
+      <entry key="S5" value="8.553870295894377" />
+      <entry key="S10" value="13.499515404176265" />
+      <entry key="S30" value="29.917838915126268" />
+      <entry key="S60" value="43.48605764013578" />
+      <entry key="M2" value="71.54341740176147" />
+      <entry key="M5" value="175.8113926992945" />
+      <entry key="M10" value="322.84191134630333" />
+      <entry key="M15" value="451.2788390838448" />
+      <entry key="M30" value="784.808329761375" />
+      <entry key="H1" value="1249.1022753201937" />
+      <entry key="H2" value="1728.4308695695452" />
+      <entry key="H4" value="2104.715827867417" />
+      <entry key="D1" value="2536.2967684518308" />
+      <entry key="W1" value="2624.7720743943696" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -125,23 +122,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.9201876506248758" />
-      <entry key="MS500" value="0.9862818457525113" />
-      <entry key="S2" value="2.643764628393039" />
-      <entry key="S5" value="9.159877618593343" />
-      <entry key="S10" value="19.884893022969734" />
-      <entry key="S30" value="42.90761348063809" />
-      <entry key="S60" value="59.083772474587875" />
-      <entry key="M2" value="76.25621233102744" />
-      <entry key="M5" value="113.95228651401244" />
-      <entry key="M10" value="217.6449930325575" />
-      <entry key="M15" value="334.1202055586045" />
-      <entry key="M30" value="636.7769758078779" />
-      <entry key="H1" value="1029.9883634972089" />
-      <entry key="H2" value="1413.4314338792449" />
-      <entry key="H4" value="1704.0131007189345" />
-      <entry key="D1" value="2029.010846129749" />
-      <entry key="W1" value="2094.7192680581625" />
+      <entry key="MS100" value="1.3074478559339031" />
+      <entry key="MS500" value="3.2918765159484025" />
+      <entry key="S2" value="6.531316419973015" />
+      <entry key="S5" value="8.545492660594427" />
+      <entry key="S10" value="13.493013543824077" />
+      <entry key="S30" value="29.9131433193469" />
+      <entry key="S60" value="43.48263679344251" />
+      <entry key="M2" value="71.54051095317674" />
+      <entry key="M5" value="175.8082386879719" />
+      <entry key="M10" value="322.838735528728" />
+      <entry key="M15" value="451.27565136084075" />
+      <entry key="M30" value="784.8051187337392" />
+      <entry key="H1" value="1249.099401947738" />
+      <entry key="H2" value="1728.4287357731234" />
+      <entry key="H4" value="2104.7144772913434" />
+      <entry key="D1" value="2536.2964876794176" />
+      <entry key="W1" value="2624.7720326292656" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -193,7 +190,7 @@
     "Spring Boot.TpFilRougeApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "feat/ajout__lot__alpha__1__Impor__export__donnée",
+    "git-widget-placeholder": "feat/expose__api__rest",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "P:/MES COURS/Developpement Full Stack avec Java/ALTN72 - 2026_2027/DEV_CODE/GitHub/TpFilRouge_CORRIGE_5",
@@ -308,7 +305,7 @@
       <workItem from="1793357510840" duration="2526000" />
       <workItem from="1793366506661" duration="7950000" />
       <workItem from="1793732769815" duration="5148000" />
-      <workItem from="1793813999637" duration="2770000" />
+      <workItem from="1793813999637" duration="4581000" />
     </task>
     <servers />
   </component>

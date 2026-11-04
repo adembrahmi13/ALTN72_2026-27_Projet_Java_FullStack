@@ -13,6 +13,9 @@ import java.util.List;
 
 public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
+    @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
+    List<Incident> findAllByOrderByDateHeureOuvertureDescIdDesc();
+
     // Sérialise deux demandes de clôture afin de conserver la première date de résolution.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select i from Incident i where i.id = :id")

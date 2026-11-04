@@ -59,10 +59,10 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 
 - **Tests :** `mvn verify`, sans serveur MariaDB nécessaire.
 - **Déploiement :** aucune URL fournie à ce stade.
-- **API incidents et Swagger / OpenAPI :** non implémentés (F12).
+- **API incidents et Swagger / OpenAPI :** F12 disponible. Après connexion, ouvrir [Swagger UI](http://localhost:8080/swagger-ui.html) ou le lien de l'accueil ; schéma JSON : `/v3/api-docs`.
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F7 et F10 à F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F7, F10 et F11 ainsi que la visualisation du lot alpha restent à développer. F12 expose la consultation et la résolution via une API documentée. L'import CSV et l'export PDF sont disponibles au responsable. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -87,6 +87,7 @@ Packages relatifs à `altn72.tpfilrouge`.
 | Couche | Emplacement | Responsabilité |
 | --- | --- | --- |
 | Contrôleurs web | `controleur` | Routes, formulaires, modèles de vues et redirections |
+| API REST | `api` | Routes JSON, DTO sans entités JPA récursives et erreurs ProblemDetail |
 | Services | `service` | Déclaration, recherche des ressources, détail et durée d'incident |
 | Repositories | `repository` ; interfaces héritées aussi dans `modele` | Accès aux données JPA |
 | Modèle | `modele` | Entités et enum Profil |
@@ -117,13 +118,16 @@ gérées par le parent Spring Boot. Apache Commons CSV 1.14.1 et Apache PDFBox 3
 sont ajoutés pour l'import et l'export ; aucune bibliothèque graphique n'est
 encore ajoutée. L'interface utilise du CSS local et des polices système.
 
+F12 utilise `springdoc-openapi-starter-webmvc-ui` 3.2.0, compatible avec Spring Boot
+4.1 selon la [matrice springdoc](https://springdoc.org/#what-is-the-compatibility-matrix-of-springdoc-openapi-with-spring-boot).
+
 ## TESTS
 
 - **Stratégie :** intégration Spring Boot avec MockMvc, services et repositories réels, base H2 en mémoire en mode MariaDB. Aucun service métier mocké.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Dernière validation :** `mvn verify` réussi ; 45 tests du socle, 11 tests d'import CSV et 5 tests d'export PDF, soit 61 tests sans échec ni erreur.
+- **Dernière validation :** `mvn verify` réussi ; 61 tests existants et 14 nouveaux tests F12 (13 API et 1 session Swagger), soit 75 tests sans échec ni erreur.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -141,6 +145,8 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
 | Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
 | Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
+| F12 | Liste, détail, DTO, résolution, permissions, erreurs JSON, CSRF et génération Swagger/OpenAPI | `IncidentApiTest` | 13 |
+| F12 / session | Connexion réelle par formulaire puis résolution avec cookies de session et CSRF, sans jeton simulé | `SwaggerSessionTest` | 1 |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -150,13 +156,13 @@ et les durées exactes en jours, heures et minutes.
 
 | Comportement | Situation |
 | --- | --- |
-| Connexion réussie et déconnexion complète | Tests dédiés à ajouter |
+| Déconnexion complète | Connexion réussie couverte par le parcours session Swagger ; scénario de déconnexion dédié à ajouter |
 | Indicateurs 47 h / 48 h / 72 h et état affecté (RG3–RG4) | F11 non réalisée |
 | Affectation, réaffectation et exclusion du tableau de bord (RG5–RG6) | F8 réalisée et testée ; F7 et F11 restent à réaliser |
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
 | Restrictions des futures fonctions F7, F10 et F11 (RG11) | Restrictions F6 et F8 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
-| API incidents et agrégations graphiques | Fonctionnalités absentes |
+| Agrégations graphiques | Fonctionnalité absente |
 | Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB | Tests sur H2 uniquement |
 | Aspect visuel et comportement mobile réels | Pas de test navigateur ni de capture visuelle effectués |
@@ -314,6 +320,73 @@ permet de consulter le prestataire. `EvaluationRepository.findByIncident_Id`
 retrouve l'évaluation. L'unicité de `evaluation.incident_id` est définie dans JPA
 et SQL. Les contrôles métier complets de saisie restent à implémenter en F10.
 
+### API REST documentée — F12
+
+L'API réutilise les services et règles métier F5/F8. Elle retourne des DTO dédiés :
+`ResumeIncidentApi` expose identité, description, statut, dates, équipement,
+station et prestataire éventuel ; `DetailIncidentApi` regroupe ce résumé dans
+`incident`, la `dureeOuverture` et l'`evaluation` éventuelle.
+Aucune entité utilisateur ni mot de passe n'est sérialisé.
+`IncidentApiService` effectue les lectures et transformations en transaction.
+
+| Méthode et route | Action | Profils | Succès |
+| --- | --- | --- | --- |
+| `GET /api/incidents` | Incidents ouverts et résolus, triés par ouverture décroissante puis identifiant décroissant | Responsable et agent | 200, tableau JSON, éventuellement vide |
+| `GET /api/incidents/{id}` | Détail et évaluation éventuelle | Responsable et agent | 200 |
+| `POST /api/incidents/{id}/resoudre` | Résoudre avec la date du serveur, sans corps de requête | Responsable | 200, détail après résolution |
+| `GET /api/csrf` | Nom de l'en-tête et jeton de la session | Connecté | 200 |
+
+La mutation appelle `IncidentService.resoudreIncident`, avec les mêmes contrôles
+F8 et le verrou de clôture. Une date, un statut ou un profil transmis par le
+client ne remplace pas les valeurs décidées par le serveur.
+
+#### Codes HTTP et erreurs
+
+Les erreurs métier sont rendues en `application/problem+json` par
+`GestionnaireExceptionsApi`, prioritaire et limité au contrôleur API.
+Les pages web conservent leur gestionnaire HTML.
+
+| Code | Situation |
+| --- | --- |
+| 200 | Consultation ou résolution réussie |
+| 400 | Identifiant non numérique |
+| 401 | API consultée sans session authentifiée |
+| 403 | Profil interdit ou jeton CSRF absent/invalide |
+| 404 | Incident inexistant |
+| 405 | Méthode HTTP non prise en charge sur une route existante |
+| 409 | Incident déjà résolu ou résolution antérieure à l'ouverture |
+
+Une chaîne Spring Security dédiée à `/api/**` renvoie des erreurs JSON pour
+l'authentification et le CSRF ; les routes web et Swagger redirigent les visiteurs
+vers `/connexion`. La protection n'est pas fondée sur la visibilité des boutons.
+
+#### Utilisation de Swagger et de la session
+
+1. Lancer l'application et se connecter via `/connexion` avec un compte de démonstration.
+2. Depuis l'accueil, ouvrir « Documentation et test de l'API (Swagger) »,
+   ou `http://localhost:8080/swagger-ui.html`, dans le même navigateur.
+3. Déployer une opération, cliquer sur « Try it out », saisir l'identifiant si nécessaire
+   et exécuter. La résolution modifie réellement l'incident.
+4. Le compte agent peut tester les consultations ; la résolution lui est interdite.
+
+La description OpenAPI est servie à `/v3/api-docs`. Elle documente les paramètres,
+les schémas, les réponses et la session `JSESSIONID` ; seuls les endpoints `/api/**`
+sont inclus. La documentation est protégée par connexion.
+
+La session du formulaire est partagée avec l'API. La protection CSRF est conservée,
+avec `CookieCsrfTokenRepository` et un en-tête `X-XSRF-TOKEN`.
+`CsrfCookieFilter` matérialise le jeton différé ; Swagger lit le cookie
+`XSRF-TOKEN` grâce à `springdoc.swagger-ui.csrf.enabled=true`.
+Un client externe doit conserver ses cookies après connexion, appeler
+`GET /api/csrf` et renvoyer le jeton dans l'en-tête indiqué pour les POST.
+Les formulaires HTML continuent à envoyer leur champ CSRF Thymeleaf.
+
+Le parcours session/CSRF est testé avec les vrais cookies, séparément des tests
+utilisant `.with(csrf())` qui installent un repository CSRF de test.
+Pas de pagination, de jeton JWT ni de connexion HTTP Basic dans cette version.
+Les tests utilisent H2/MockMvc ; la vérification visuelle de Swagger et les essais
+sur MariaDB restent à effectuer.
+
 ### Exceptions
 
 - **Guardian :** `RessourceIntrouvableException`, gérée par `GestionnaireExceptionsWeb` avec `@ControllerAdvice`.
@@ -385,7 +458,7 @@ dans une transaction de service pour respecter RG10.
 - Protection CSRF conservée ; formulaires Thymeleaf et jetons CSRF dans les tests POST.
 - En-tête commun avec prénom, profil et déconnexion.
 - F6 : sécurité de méthode, permissions par champ et par état dans le service ; masquer un contrôle dans la vue ne remplace pas la vérification serveur.
-- API incidents absente ; sécurité et erreurs à valider lors de F12.
+- F12 : API de consultation pour les deux profils, résolution réservée au responsable, erreurs JSON et session/CSRF testés.
 
 ### Interface et CSS commun
 
@@ -523,7 +596,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F7 et F10 à F12, la visualisation du lot alpha et le déploiement restent à réaliser.
+F7, F10 et F11, la visualisation du lot alpha et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -549,7 +622,7 @@ restent également à effectuer.
 | F9 Historique des résolus | Réalisée ; accessible aux deux profils, tri par résolution décroissante, 6 tests dédiés |
 | F10 Évaluer un prestataire | Saisie absente ; lecture disponible dans F5 |
 | F11 Tableau de bord | Non réalisé |
-| F12 API incidents + Swagger | Non réalisée |
+| F12 API incidents + Swagger | Réalisée ; consultation, résolution, session/CSRF, 14 tests dédiés |
 | Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
 | Lot alpha 2 : graphiques | Non réalisé |
 | Harmonisation CSS de toutes les pages | Réalisée ; vérification visuelle navigateur restante |
@@ -560,7 +633,7 @@ restent également à effectuer.
 - [ ] Valider le lancement sur clone propre avec ce README.
 - [ ] Exécuter le script corrigé sur MariaDB vierge.
 - [ ] Générer des dates relatives et les cas 47 h / 48 h / 72 h.
-- [ ] Terminer F7 et F10 à F12 et vérifier RG1 à RG11.
+- [ ] Terminer F7, F10 et F11 et vérifier RG1 à RG11.
 - [ ] Appliquer et tester les restrictions propres aux profils.
 - [ ] Réaliser et documenter les deux fonctions transverses.
 - [x] Ajouter et justifier une requête JPQL explicite (lecture verrouillée pour F8).
