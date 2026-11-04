@@ -16,6 +16,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import altn72.tpfilrouge.formulaire.ModificationIncident;
 import altn72.tpfilrouge.service.DroitsIncident;
+import altn72.tpfilrouge.repository.PrestataireRepository;
 
 @Controller
 public class IncidentController {
@@ -24,11 +25,14 @@ public class IncidentController {
     private final IncidentService incidentService;
     private final EquipementService equipementService;
     private final DroitsIncident droitsIncident;
+    private final PrestataireRepository prestataireRepository;
 
-    public IncidentController(IncidentService incidentService, EquipementService equipementService, DroitsIncident droitsIncident) {
+    public IncidentController(IncidentService incidentService, EquipementService equipementService,
+                              DroitsIncident droitsIncident, PrestataireRepository prestataireRepository) {
         this.incidentService = incidentService;
         this.equipementService = equipementService;
         this.droitsIncident = droitsIncident;
+        this.prestataireRepository = prestataireRepository;
     }
 
     @InitBinder("modificationIncident")
@@ -84,6 +88,7 @@ public class IncidentController {
         model.addAttribute("incident", detail.incident());
         model.addAttribute("modificationAutorisee", droitsIncident.peutModifier(detail.incident()));
         model.addAttribute("resolutionAutorisee", droitsIncident.peutResoudre(detail.incident()));
+        model.addAttribute("prestataires", prestataireRepository.findAll());
         return "detailIncident";
     }
 
