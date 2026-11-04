@@ -29,10 +29,10 @@ a:hover { color: var(--primaire-fonce); }
 a, button, input, textarea, select { transition: background-color .18s, border-color .18s, box-shadow .18s; }
 :focus-visible { outline: 3px solid #bc730e; outline-offset: 4px; }
 .entete-utilisateur {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 1.4rem;
-    flex-wrap: wrap;
     padding: 1.1rem max(1.5rem, calc((100vw - 1240px) / 2));
     background: var(--surface);
     border-bottom: 1px solid var(--bordure);
@@ -40,11 +40,12 @@ a, button, input, textarea, select { transition: background-color .18s, border-c
 }
 .marque { display: inline-flex; align-items: center; gap: .7rem; font-size: 1.3rem; font-weight: 750; text-decoration: none; letter-spacing: -.04em; }
 .marque-symbole { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: var(--primaire); color: white; font-size: 1.25rem; }
-.entete-utilisateur nav { display: flex; gap: .35rem; margin-right: auto; flex-wrap: wrap; }
+.entete-utilisateur nav { display: flex; gap: .35rem; flex-wrap: wrap; min-width: 0; }
 .entete-utilisateur nav a { padding: .5rem .8rem; border-radius: 9px; text-decoration: none; font-weight: 600; color: var(--secondaire); font-size: .9rem; }
 .entete-utilisateur nav a:hover { background: var(--accent-clair); color: var(--primaire-fonce); }
-.entete-utilisateur > span { font-size: .85rem; }
-.entete-utilisateur > span:nth-last-of-type(1) { color: var(--bordure); }
+.compte-utilisateur { display: flex; align-items: center; justify-content: flex-end; gap: .8rem; min-width: 0; }
+.identite-utilisateur { font-size: .85rem; text-align: right; }
+.formulaire-deconnexion { flex-shrink: 0; white-space: nowrap; }
 main, main.container {
     width: min(1180px, calc(100% - 3rem));
     margin: 2.8rem auto;
@@ -136,11 +137,15 @@ hr { border: 0; border-top: 1px solid var(--bordure); margin: 2rem 0; }
 .text-muted { color: var(--secondaire); }
 caption { padding: .8rem 1.15rem; text-align: left; color: var(--secondaire); font-size: .85rem; }
 .bouton-secondaire { display: inline-block; padding: .7rem 1rem; margin-top: 1rem; }
+@media (max-width: 1200px) {
+    .entete-utilisateur { grid-template-columns: auto minmax(0, 1fr); }
+    .entete-utilisateur nav { grid-column: 1 / -1; grid-row: 2; }
+    .compte-utilisateur { grid-column: 2; grid-row: 1; }
+}
 @media (max-width: 760px) {
     .entete-utilisateur { gap: .7rem 1rem; padding: 1rem; }
-    .entete-utilisateur nav { order: 3; width: 100%; }
-    .marque { margin-right: auto; }
-    .entete-utilisateur > span { font-size: .75rem; }
+    .compte-utilisateur { flex-wrap: wrap; gap: .4rem; }
+    .identite-utilisateur { font-size: .75rem; }
     main, main.container { width: calc(100% - 1.5rem); margin: 1.5rem auto; padding: 1.25rem; border-radius: 14px; }
     h1 { margin-top: .7rem; }
     dl { grid-template-columns: minmax(105px, 32%) minmax(0, 1fr); }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface StationRepository extends JpaRepository<Station, Integer> {
 
     List<Station> findAllByOrderByNomAsc();
+    List<Station> findByNomIgnoreCase(String nom);
 }
