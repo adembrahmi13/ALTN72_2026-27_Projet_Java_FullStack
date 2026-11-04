@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AffectationPrestataireService {
 
@@ -19,6 +21,10 @@ public class AffectationPrestataireService {
     public AffectationPrestataireService(IncidentRepository incidentRepository, PrestataireRepository prestataireRepository) {
         this.incidentRepository = incidentRepository;
         this.prestataireRepository = prestataireRepository;
+    }
+
+    public List<Prestataire> listerPrestataires() {
+        return prestataireRepository.findAll();
     }
 
     // RG5 : un incident résolu ne peut plus être affecté ni réaffecté

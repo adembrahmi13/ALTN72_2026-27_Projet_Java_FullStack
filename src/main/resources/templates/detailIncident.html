@@ -1,104 +1,69 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Détail de l'incident</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
-  </head>
-  <body>
-    <div th:replace="~{fragments/entete :: entete}"></div>
-    <main>
-      <p>
-        <a th:href="@{/equipements/{id}(id=${incident.equipement.id})}"
-          >← Fiche de l'équipement</a
-        >
-      </p>
-      <h1>Incident n° <span th:text="${incident.id}"></span></h1>
-      <p class="message-info" th:if="${messageSucces}" th:text="${messageSucces}" role="status"></p>
-      <p th:if="${modificationAutorisee}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/entete :: entete}"></div>
+<main>
+    <p><a th:href="@{/equipements/{id}(id=${incident.equipement.id})}">← Fiche de l'équipement</a></p>
+    <h1>Incident n° <span th:text="${incident.id}"></span></h1>
+    <p class="message-info" th:if="${messageSucces}" th:text="${messageSucces}" role="status"></p>
+    <p th:if="${modificationAutorisee}">
         <a class="bouton" th:href="@{/incidents/{id}/modifier(id=${incident.id})}">Modifier l'incident</a>
-      </p>
-      <p class="message-info" th:unless="${modificationAutorisee}">Cet incident est en lecture seule.</p>
-      <form th:if="${resolutionAutorisee}" th:action="@{/incidents/{id}/resoudre(id=${incident.id})}" method="post">
+    </p>
+    <p class="message-info" th:unless="${modificationAutorisee}">Cet incident est en lecture seule.</p>
+    <form th:if="${resolutionAutorisee}" th:action="@{/incidents/{id}/resoudre(id=${incident.id})}" method="post">
         <p>La résolution clôture l'incident et conserve son historique. Il ne pourra plus être modifié.</p>
         <button type="submit">Déclarer l'incident comme résolu</button>
-      </form>
-      <dl>
+    </form>
+    <dl>
         <dt>Description</dt>
         <dd th:text="${incident.description}"></dd>
         <dt>Équipement</dt>
-        <dd>
-          <a
-            th:href="@{/equipements/{id}(id=${incident.equipement.id})}"
-            th:text="${incident.equipement.referenceUnique}"
-          ></a>
-          — <span th:text="${incident.equipement.libelleDescription}"></span>
-        </dd>
+        <dd><a th:href="@{/equipements/{id}(id=${incident.equipement.id})}" th:text="${incident.equipement.referenceUnique}"></a>
+            — <span th:text="${incident.equipement.libelleDescription}"></span></dd>
         <dt>Station</dt>
         <dd th:text="${incident.equipement.station.nom}"></dd>
         <dt>Statut</dt>
         <dd th:text="${incident.statut}"></dd>
         <dt>Ouverture</dt>
-        <dd
-          th:text="${#temporals.format(incident.dateHeureOuverture, 'dd/MM/yyyy HH:mm')}"
-        ></dd>
+        <dd th:text="${#temporals.format(incident.dateHeureOuverture, 'dd/MM/yyyy HH:mm')}"></dd>
         <dt>Durée d'ouverture</dt>
         <dd th:text="${detail.dureeOuverture}"></dd>
         <dt>Résolution</dt>
-        <dd
-          th:text="${incident.dateHeureResolution != null ? #temporals.format(incident.dateHeureResolution, 'dd/MM/yyyy HH:mm') : 'Non résolu'}"
-        ></dd>
-      </dl>
-      <h2>Prestataire</h2>
-      <p th:if="${incident.prestataire == null}">Aucun prestataire affecté.</p>
-      <dl th:if="${incident.prestataire != null}">
-        <dt>Nom</dt>
-        <dd th:text="${incident.prestataire.nom}"></dd>
-        <dt>Contact</dt>
-        <dd th:text="${incident.prestataire.contact}"></dd>
-      </dl>
-      <section th:if="${affectationAutorisee}">
-        <h3
-          th:text="${incident.prestataireId == null
-                   ? 'Affecter un prestataire'
-                   : 'Réaffecter un prestataire'}"
-        ></h3>
-
-        <form
-          th:action="@{/incidents/{id}/affecter-prestataire(id=${incident.id})}"
-          method="post"
-        >
-          <label for="prestataireId">Choisir un prestataire :</label>
-
-          <select id="prestataireId" name="prestataireId" required>
-            <option value="">-- Sélectionner --</option>
-
-            <option
-              th:each="prestataire : ${prestataires}"
-              th:value="${prestataire.id}"
-              th:text="${prestataire.nom}"
-              th:selected="${prestataire.id == incident.prestataireId}"
-            ></option>
-          </select>
-
-          <button type="submit">Confirmer l'affectation</button>
+        <dd th:text="${incident.dateHeureResolution != null ? #temporals.format(incident.dateHeureResolution, 'dd/MM/yyyy HH:mm') : 'Non résolu'}"></dd>
+    </dl>
+    <h2>Prestataire</h2>
+    <p th:if="${incident.prestataire == null}">Aucun prestataire affecté.</p>
+    <dl th:if="${incident.prestataire != null}">
+        <dt>Nom</dt><dd th:text="${incident.prestataire.nom}"></dd>
+        <dt>Contact</dt><dd th:text="${incident.prestataire.contact}"></dd>
+    </dl>
+    <section th:if="${affectationAutorisee}">
+        <h3 th:text="${incident.prestataireId == null ? 'Affecter un prestataire' : 'Réaffecter un prestataire'}"></h3>
+        <form th:action="@{/incidents/{id}/affecter-prestataire(id=${incident.id})}" method="post">
+            <label for="prestataireId">Choisir un prestataire :</label>
+            <select id="prestataireId" name="prestataireId" required>
+                <option value="">-- Sélectionner --</option>
+                <option th:each="prestataire : ${prestataires}" th:value="${prestataire.id}"
+                        th:text="${prestataire.nom}" th:selected="${prestataire.id == incident.prestataireId}"></option>
+            </select>
+            <button type="submit">Confirmer l'affectation</button>
         </form>
-      </section>
-      <h2>Évaluation</h2>
-      <p th:if="${detail.evaluation == null}">Aucune évaluation.</p>
-      <dl th:if="${detail.evaluation != null}">
-        <dt>Note</dt>
-        <dd><span th:text="${detail.evaluation.note}"></span> / 5</dd>
+    </section>
+    <h2>Évaluation</h2>
+    <p th:if="${detail.evaluation == null}">Aucune évaluation.</p>
+    <dl th:if="${detail.evaluation != null}">
+        <dt>Note</dt><dd><span th:text="${detail.evaluation.note}"></span> / 5</dd>
         <dt>Commentaire</dt>
-        <dd
-          th:text="${#strings.isEmpty(detail.evaluation.commentaire) ? 'Aucun commentaire.' : detail.evaluation.commentaire}"
-        ></dd>
-        <dt>Date</dt>
-        <dd
-          th:text="${#temporals.format(detail.evaluation.date, 'dd/MM/yyyy')}"
-        ></dd>
-      </dl>
-    </main>
-  </body>
+        <dd th:text="${#strings.isEmpty(detail.evaluation.commentaire) ? 'Aucun commentaire.' : detail.evaluation.commentaire}"></dd>
+        <dt>Date</dt><dd th:text="${#temporals.format(detail.evaluation.date, 'dd/MM/yyyy')}"></dd>
+    </dl>
+</main>
+</body>
 </html>
+

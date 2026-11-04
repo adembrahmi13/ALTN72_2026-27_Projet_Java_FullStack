@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "incident")
 public class Incident {
-    // Variables 
     public static final String STATUT_NON_AFFECTE = "Non affecté";
     public static final String STATUT_RESOLU = "Résolu";
     public static final String STATUT_AFFECTE = "Affecté";
