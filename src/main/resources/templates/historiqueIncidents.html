@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,6 +11,9 @@
 <main>
     <p class="surtitre">Suivi des interventions</p>
     <h1>Historique des incidents résolus</h1>
+    <p sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')">
+        <a class="bouton" th:href="@{/incidents/historique/export.pdf}">Exporter l'historique en PDF</a>
+    </p>
     <p class="introduction">Retrouvez les incidents clôturés, de la résolution la plus récente à la plus ancienne.</p>
     <p th:if="${#lists.isEmpty(incidents)}" class="message-info">Aucun incident résolu pour le moment.</p>
     <div class="table-scroll" tabindex="0" role="region" aria-label="Historique des incidents résolus"

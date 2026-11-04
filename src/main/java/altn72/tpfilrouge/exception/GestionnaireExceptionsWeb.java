@@ -11,6 +11,13 @@ public class GestionnaireExceptionsWeb {
 
     private static final String VUE_ERREUR = "erreur";
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
+    public String gererFichierTropVolumineux(Model model) {
+        model.addAttribute("message", "Le fichier dépasse la taille autorisée. Importez un CSV de 1 Mio maximum.");
+        return VUE_ERREUR;
+    }
+
     @ExceptionHandler(ResolutionIncidentInterditeException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public String gererResolutionInterdite(ResolutionIncidentInterditeException exception, Model model) {

@@ -9,5 +9,6 @@ import java.util.List;
 public interface EquipementRepository extends JpaRepository<Equipement, Integer> {
 
     List<Equipement> findByStation_Id(Integer stationId);
+    boolean existsByReferenceUniqueIgnoreCase(String referenceUnique);
     
 }

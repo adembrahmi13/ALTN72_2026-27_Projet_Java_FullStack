@@ -2,7 +2,7 @@
 
 **Groupe :** Adem BRAHMI, Kais DILMI
 
-**Mise à jour :** 3 novembre 2026
+**Mise à jour :** 4 novembre 2026
 
 **Date limite Moodle :** 5 novembre 2026 à 23 h 59.
 
@@ -62,7 +62,7 @@ Changer cette variable ne change pas le mot de passe des comptes déjà créés.
 - **API incidents et Swagger / OpenAPI :** non implémentés (F12).
 - **Démonstration SQL :** deux stations, trois équipements (distributeur, portique, borne), deux prestataires, deux incidents dont un résolu, et une évaluation.
 - **Dates :** encore fixes en juin 2026 ; génération relative à maintenant et cas 47 h / 48 h / 72 h restant à réaliser.
-- **Limites :** F7 et F10 à F12 ainsi que les deux fonctions transverses restent à développer. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
+- **Limites :** F7 et F10 à F12 ainsi que la visualisation du lot alpha restent à développer. L'import CSV et l'export PDF du lot alpha sont disponibles au responsable. F6 permet de corriger la description et, sous conditions, l'équipement ; F8 permet au responsable de clôturer un incident ; F9 présente les incidents résolus aux deux profils. Le prestataire et l'évaluation sont consultables dans F5, sans formulaire d'affectation ni de saisie.
 - **Héritage du TP :** les pages programmeurs sont conservées et restylées ; leur table n'est pas créée par le script Guardian. Leur fonctionnement sur une base initialisée uniquement avec ce script n'a pas été validé.
 
 ## ARCHITECTURE
@@ -113,7 +113,8 @@ erDiagram
 Java 25, Maven, Spring Boot 4.1.1, Spring MVC, Spring Data JPA / Hibernate,
 Spring Security, Thymeleaf et son intégration Spring Security, Jakarta Validation,
 pilote MariaDB, H2, JUnit Jupiter et MockMvc. Les versions des dépendances sont
-gérées par le parent Spring Boot. Aucune bibliothèque CSV ou graphique n'est
+gérées par le parent Spring Boot. Apache Commons CSV 1.14.1 et Apache PDFBox 3.0.8
+sont ajoutés pour l'import et l'export ; aucune bibliothèque graphique n'est
 encore ajoutée. L'interface utilise du CSS local et des polices système.
 
 ## TESTS
@@ -122,7 +123,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Dernière validation :** `mvn verify` réussi ; 16 tests pour F1 à F5, 13 tests F6, 10 tests F8 et 6 tests F9, soit 45 tests sans échec ni erreur.
+- **Dernière validation :** `mvn verify` réussi ; 45 tests du socle, 11 tests d'import CSV et 5 tests d'export PDF, soit 61 tests sans échec ni erreur.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -138,6 +139,8 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 | F6 | Formulaires selon profil, correction de description, changement d'équipement réservé au responsable avant affectation, refus sans modification partielle, champs sensibles ignorés, validation, 404, incident résolu en 409, visiteur et CSRF, rôle inconnu refusé au service | `ModificationIncidentTest` | 13 |
 | F8 | Résolution avec/sans prestataire, date serveur, égalité avec ouverture, ouverture future refusée, double clôture refusée, statut déjà résolu sans date, agent refusé par URL et service, 404, visiteur, CSRF | `ResolutionIncidentTest` | 10 |
 | F9 | Tri par résolution et exclusion des incidents ouverts/incohérents, consultation agent avec prestataire, état vide, visiteur redirigé, intégration F8, ordre stable à date égale | `HistoriqueIncidentsTest` | 6 |
+| Import CSV | Accents/BOM, guillemets, séparateurs et retours à la ligne, doublons, stations inconnues/ambiguës, données invalides, limites, modèles, droits et CSRF | `ImportDonneesTest` | 11 |
+| Export PDF | PDF lisible, ordre et exclusion des incidents ouverts, fichier vide, pagination et longs textes, permissions et visiteur | `ExportHistoriquePdfTest` | 5 |
 
 F4 vérifie qu'un statut et un prestataire envoyés dans un formulaire manipulé
 ne remplacent pas les valeurs imposées par le service. F5 vérifie le HTML rendu
@@ -153,7 +156,8 @@ et les durées exactes en jours, heures et minutes.
 | Refus d'évaluation avant résolution, doublons, notes invalides (RG8) | Saisie F10 absente ; contraintes présentes sans tests dédiés |
 | Référence d'équipement unique (RG9) | Contrainte présente, test de violation absent |
 | Restrictions des futures fonctions F7, F10 et F11 (RG11) | Restrictions F6 et F8 testées ; permissions des fonctions futures à ajouter lors de leur réalisation |
-| API incidents, import/export et agrégations graphiques | Fonctionnalités absentes |
+| API incidents et agrégations graphiques | Fonctionnalités absentes |
+| Import/export sur MariaDB et limites HTTP multipart réelles | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB | Tests sur H2 uniquement |
 | Aspect visuel et comportement mobile réels | Pas de test navigateur ni de capture visuelle effectués |
 
@@ -320,7 +324,8 @@ et SQL. Les contrôles métier complets de saisie restent à implémenter en F10
 - **Résolution F8 / 409 :** `ResolutionIncidentInterditeException` refuse une double clôture ou une date antérieure à l'ouverture.
 - **Droits F6 / 403 :** `AccessDeniedException` est traitée par le gestionnaire web avec un message français.
 - **Pages :** `erreur.html` affiche le message et propose un retour à l'accueil.
-- **`ResponseEntity` :** non utilisé pour les routes Guardian actuelles, qui retournent des vues et redirections. Les routes héritées du TP utilisent aussi `ResponseStatusException`.
+- **`ResponseEntity` :** utilisé pour les téléchargements des modèles CSV et de l'historique PDF, avec type MIME et en-tête `Content-Disposition`. Les routes de consultation retournent des vues ou redirections.
+- **Import :** `ImportCsvException` donne un message métier sans insertion partielle ; dépassement multipart traité en 413 avec une page d'erreur française.
 
 ### Principes SOLID
 
@@ -363,6 +368,7 @@ entités ; ils ne valident pas l'exécution du script MariaDB.
 | `IncidentService.modifierIncident`, `@Transactional` | Vérifier les droits et enregistrer description/rattachement ensemble par dirty checking JPA |
 | `IncidentService.resoudreIncident`, `@Transactional` | Vérifier et verrouiller l'incident, enregistrer statut et date ensemble (RG5 et RG10) |
 | `IncidentService.consulterHistorique`, lecture seule | Lire les incidents résolus et leurs relations pour F9 |
+| `ImportCsvService.importer`, `@Transactional` | Valider tout le fichier, puis insérer et flusher le lot ; rollback en cas d'erreur (RG10) |
 | Repositories Spring Data | Transactions standard, dont l'insertion F4 |
 | `ProgrammeurService.supprimerProgrammeur` et `modifierProgrammeur` (TP) | Vérification/suppression et lecture/modification dans une transaction |
 | Tests de données | Retour arrière après chaque test |
@@ -406,15 +412,71 @@ dans un navigateur reste à effectuer.
 
 ### Import / export de données — piste 9
 
-- **Besoin envisagé :** alimenter le réseau et exploiter les incidents hors de l'application.
-- **État :** choix du journal initial, sans implémentation actuelle.
-- **Périmètre restant à décider :** entités importables, format CSV, encodage, filtres d'export et gestion des doublons de référence.
-- **Choix et essais :** aucune bibliothèque ni route dédiée ajoutée.
-- **Erreurs :** définir traitement des fichiers et lignes invalides, import atomique ou partiel.
-- **Droits :** à décider et à appliquer côté serveur.
-- **Fonctionnement et tests :** aucun parcours disponible ou testé.
-- **Difficultés :** pas de retour d'implémentation à ce stade.
-- **Suite :** fixer le périmètre, développer, tester et fournir un exemple reproductible.
+- **Besoin :** charger un inventaire préparé dans un tableur sans saisir les stations et équipements un par un, puis partager l'historique sous forme de document lisible.
+- **État :** import de stations et équipements en CSV, export de l'historique F9 en PDF implémentés.
+- **Indépendance :** aucune dépendance à F10 ou F11 ; les évaluations ne sont pas incluses dans le PDF.
+- **Droits :** responsable uniquement pour import, modèles et export PDF. L'agent conserve la lecture F9. Contrôles `@PreAuthorize` sur le contrôleur et les services, boutons réservés au responsable, CSRF sur l'import.
+- **Bibliothèques :** [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/) 1.14.1 et [Apache PDFBox](https://pdfbox.apache.org/) 3.0.8.
+
+#### Utilisation et format CSV
+
+1. Se connecter comme responsable et ouvrir « Importer des données » dans le menu.
+2. Télécharger le modèle stations, remplacer les exemples, puis importer les stations.
+3. Télécharger le modèle équipements et renseigner les noms de stations déjà présents.
+4. Enregistrer en CSV UTF-8, séparateur point-virgule ; conserver l'ordre exact des en-têtes.
+5. Sélectionner le type et le fichier, puis importer. Une confirmation indique le nombre ajouté.
+
+En-tête stations : `nom` (obligatoire, 100 caractères maximum).
+
+En-tête équipements : `reference;libelle;type;station;etat`.
+Tous les champs sont obligatoires : référence 50 caractères, libellé 10 000,
+type 50, nom de station 100, état 50. La station est retrouvée par son nom sans
+distinction de casse ; une station absente ou ambiguë provoque un refus.
+
+Les modèles sont disponibles à `/donnees/modeles/stations.csv` et
+`/donnees/modeles/equipements.csv`. Ils contiennent un BOM UTF-8 pour le tableur.
+Le parseur accepte UTF-8 avec ou sans BOM, valeurs entre guillemets, séparateurs
+et retours à la ligne dans les valeurs. Maximum : 1 Mio et 5 000 lignes de données.
+
+#### Validation et atomicité
+
+Le service ne modifie aucun élément existant. Les noms de stations et références
+d'équipements déjà présents ou répétés dans le fichier sont refusés sans distinction
+de casse. Les références restent protégées par leur contrainte unique en base (RG9).
+Le nom de station n'ayant pas de contrainte unique, deux imports concurrents de
+stations identiques ne sont pas garantis sans doublon ; ce cas reste une limite.
+
+Le service valide toutes les lignes avant d'insérer. Une transaction entoure
+le lot et le flush : une erreur annule l'ensemble, sans import partiel.
+Le message désigne le numéro de ligne de données (hors en-tête, un enregistrement
+CSV pouvant contenir plusieurs lignes physiques). En-têtes, colonnes, données,
+encodage, doublons et limites sont vérifiés ; les erreurs de base restent lisibles
+et ne montrent pas de détail SQL.
+
+#### Export PDF
+
+Depuis F9, « Exporter l'historique en PDF » télécharge
+`/incidents/historique/export.pdf`, fichier `historique-incidents.pdf`.
+Le service réutilise le tri F9 : incidents résolus, date de clôture décroissante.
+Le document indique la date de génération, le nombre d'incidents, la description,
+l'équipement, la station, l'ouverture, la résolution, la durée et le prestataire
+éventuel. Un historique vide produit également un PDF valide.
+
+Le PDF A4 gère les retours à la ligne selon la largeur du texte, les nouvelles pages
+et les numéros de page. Les accents français sont conservés par la police standard ;
+les caractères non disponibles dans cette police (par exemple certains emoji)
+sont remplacés par « ? ». Le téléchargement utilise `application/pdf`,
+`Content-Disposition: attachment` et `Cache-Control: no-store`.
+
+#### Validation et limites
+
+11 tests d'import et 5 tests PDF complètent le socle : contenu réellement extrait
+avec PDFBox, tri, accents, pages multiples et permissions. Les erreurs CSV sont
+vérifiées sans création partielle.
+Les parcours sont testés avec H2/MockMvc ; contrôle visuel du PDF et tests sur MariaDB
+restent à effectuer. Pas d'import PDF, de modification par import, de filtres PDF
+ou d'export des évaluations. L'export complet est généré en mémoire : adapté à la
+démonstration actuelle, à revoir pour des historiques volumineux.
 
 ### Visualisation des données — piste 2
 
@@ -461,7 +523,7 @@ du projet pour le groupe reste à confirmer au bilan final.
 
 ### Fonctionnalités non réalisées et pourquoi
 
-F7 et F10 à F12, les deux fonctions transverses et le déploiement restent à réaliser.
+F7 et F10 à F12, la visualisation du lot alpha et le déploiement restent à réaliser.
 Aucun motif d'abandon communiqué : ce sont des travaux restants.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
@@ -488,7 +550,7 @@ restent également à effectuer.
 | F10 Évaluer un prestataire | Saisie absente ; lecture disponible dans F5 |
 | F11 Tableau de bord | Non réalisé |
 | F12 API incidents + Swagger | Non réalisée |
-| Lot alpha 1 : import / export | Non réalisé |
+| Lot alpha 1 : import / export | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés |
 | Lot alpha 2 : graphiques | Non réalisé |
 | Harmonisation CSS de toutes les pages | Réalisée ; vérification visuelle navigateur restante |
 | Déploiement | URL non fournie |
