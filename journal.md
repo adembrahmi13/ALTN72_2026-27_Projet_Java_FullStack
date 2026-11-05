@@ -543,10 +543,10 @@ transverse du lot alpha.
 
 ### Contributions
 
-| Membre      | Éléments connus                                                                     | Informations restantes                                                                |
-| ----------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Adem BRAHMI | Travaux demandés dans cette session : F5, tests, documentation et harmonisation CSS | Attribution des travaux antérieurs à confirmer par le groupe et Git                   |
-| Kais DILMI  | Membre du groupe                                                                    | Contributions détaillées non précisées dans les échanges ; à renseigner par le groupe |
+| Membre      | Contributions                                                                                                                                                                                  |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Adem BRAHMI | Schéma SQL, F1 connexion / sécurité, F5 détail, F6 modification, F8 résolution, F9 historique, F12 API REST + Swagger, import / export (piste 9), refonte du front, initialisation du journal |
+| Kais DILMI  | F2, F3, F4, F7 affectation, F10 évaluation, F11 tableau de bord, requête native, Statistiques (piste 2), tests sur H2, déploiement Railway, évolution « Équipement fragile », rebases et merges |
 
 ### Difficultés rencontrées
 
@@ -558,13 +558,21 @@ y compris après résolution.
 L'interface mélangeait des pages peu stylées et des pages Bootstrap.
 Une feuille locale commune et un en-tête partagé assurent désormais la cohérence.
 
-Ces difficultés concernent les travaux de cette session ; la difficulté principale
-du projet pour le groupe reste à confirmer au bilan final.
+La plus grande difficulté du groupe a été F11, le tableau de bord, à cause de sa
+longueur : niveaux d'attention RG3/RG4 calculés à la minute près (47 h 59, 71 h 59,
+72 h), distinction des incidents affectés, exclusion des résolus, filtres station et
+niveau, compteurs par niveau et par station (requête native), restriction au
+responsable, et 9 tests pour couvrir tous ces cas.
+
+Le travail en parallèle sur Git nous a aussi posé problème : des conflits de rebase
+ont écrasé une partie du journal, qu'il a fallu reconstituer. Nous avons aussi eu un décalage d'heure entre le serveur (UTC) et Paris, réglé
+en fixant le fuseau `Europe/Paris` côté base de données (`schema.sql`).
 
 ### Fonctionnalités non réalisées et pourquoi
 
-Toutes les fonctionnalités demandées sont réalisées et l'application est déployée.
-Aucun motif d'abandon communiqué : ce sont des travaux restants.
+Aucune fonctionnalité abandonnée : F1 à F12, les deux fonctions transverses
+(import / export, statistiques) et l'évolution « Équipement fragile » sont
+réalisées, et l'application est déployée sur Railway.
 La validation MariaDB, l'affichage navigateur et le lancement sur clone propre
 restent également à effectuer.
 
@@ -573,6 +581,33 @@ restent également à effectuer.
 1. Séparer règles métier, persistance et rendu facilite l'ajout d'une fiche sans casser la déclaration.
 2. Injecter une horloge rend les calculs de durée et les tests reproductibles.
 3. Centraliser CSS et fragments HTML assure la cohérence visuelle ; les droits restent contrôlés côté serveur.
+
+## Évolution séance finale
+
+### Description
+
+Évolution « Équipement fragile » : un équipement est fragile s'il a eu au moins 3 incidents ouverts durant les 30 derniers jours, quel que soit leur statut.
+
+- **Règle :** `EquipementService.estFragile(equipementId)`, avec les constantes `SEUIL_FRAGILE` et `FENETRE_FRAGILE_JOURS` (EF5).
+- **Comptage :** `IncidentRepository.countByEquipement_IdAndDateHeureOuvertureGreaterThanEqual` (EF1, borne incluse).
+- **Fiche équipement :** `EquipementController` passe `fragile` à `ficheEquipement.html`, qui affiche le badge « Équipement fragile ».
+- **Tableau de bord :** `IncidentActif` porte un booléen `equipementFragile` rempli par `TableauDeBordService` ; `tableauDeBord.html` affiche le badge à côté de la référence.
+- **Déclaration :** `IncidentController.declarerIncident` ajoute « Attention : cet équipement est désormais fragile. » au message de confirmation affiché sur la fiche équipement.
+
+### Choix de conception et raccourci
+
+- La règle vit uniquement dans le service (EF6) ; contrôleurs et vues ne font que lire le booléen.
+- Rien n'est stocké en base : la fenêtre glissante est recalculée à chaque consultation à partir de l'horloge injectée (EF4), ce qui rend les cas limites testables à la minute près.
+- Le comptage est fait par une requête dérivée Spring Data (`count`), sans charger les incidents en mémoire.
+- **Raccourci :** sur le tableau de bord, une requête de comptage est lancée par ligne d'incident actif. Suffisant pour le volume du projet ; à regrouper en une seule requête (`GROUP BY` équipement) si le tableau devient long.
+
+### Tests ajoutés et limites connues
+
+- `EquipementFragileTest` (7 tests) : les 7 cas limites de l'énoncé (2 incidents, 3 incidents, 3 dont 1 résolu, 30 j 1 min, 29 j 23 h 59, 2 récents + 5 vieux de 45 jours, équipement voisin).
+- `FicheEquipementTest` : badge affiché sur un équipement fragile, absent sinon.
+- `TableauDeBordTest` : badge sur les incidents de l'équipement fragile, pas sur ceux du voisin.
+- `DeclarationIncidentTest` : le message de confirmation contient « fragile » au 3e incident, pas aux deux premiers.
+- **Limites :** affichage vérifié par les tests MockMvc, pas dans un navigateur ; seuil et fenêtre sont des constantes, pas une configuration modifiable sans recompiler ; l'API REST n'expose pas l'information.
 
 ## Suivi interne
 

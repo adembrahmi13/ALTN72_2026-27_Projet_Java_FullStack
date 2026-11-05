@@ -35,6 +35,7 @@ public class EquipementController {
     public String afficherFicheEquipement(@PathVariable Integer equipementId, Model model) {
         model.addAttribute("equipement", equipementService.trouverEquipement(equipementId));
         model.addAttribute("incidents", equipementService.listerIncidents(equipementId));
+        model.addAttribute("fragile", equipementService.estFragile(equipementId));
         return "ficheEquipement";
     }
 

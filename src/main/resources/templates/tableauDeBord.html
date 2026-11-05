@@ -70,7 +70,8 @@
                           th:text="${ligne.niveau.libelle}"></span></td>
                 <td><a th:href="@{/incidents/{id}(id=${ligne.incident.id})}" th:text="${ligne.incident.description}"></a></td>
                 <td><a th:href="@{/equipements/{id}(id=${ligne.incident.equipement.id})}"
-                       th:text="${ligne.incident.equipement.referenceUnique}"></a></td>
+                       th:text="${ligne.incident.equipement.referenceUnique}"></a>
+                    <span th:if="${ligne.equipementFragile}" class="statut-incident niveau-ROUGE">Équipement fragile</span></td>
                 <td th:text="${ligne.incident.equipement.station.nom}"></td>
                 <td th:text="${ligne.dureeOuverture}"></td>
                 <td th:text="${ligne.incident.prestataire != null ? ligne.incident.prestataire.nom : 'En attente d''affectation'}"></td>

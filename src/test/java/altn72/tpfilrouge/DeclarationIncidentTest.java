@@ -17,12 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -68,6 +71,19 @@ class DeclarationIncidentTest {
         assertNotNull(incident.getDateHeureOuverture());
         assertNull(incident.getPrestataireId());
         assertNull(incident.getDateHeureResolution());
+    }
+
+    // Évolution "Équipement fragile" : le 3e incident sur 30 jours rend l'équipement fragile, le message le signale
+    @Test
+    void messageDeConfirmationSignaleLEquipementFragile() throws Exception {
+        for (int i = 1; i <= 2; i++) {
+            mockMvc.perform(post("/equipements/{id}/incidents", equipement.getId()).with(csrf())
+                            .param("description", "Panne " + i))
+                    .andExpect(flash().attribute("messageSucces", not(containsString("fragile"))));
+        }
+        mockMvc.perform(post("/equipements/{id}/incidents", equipement.getId()).with(csrf())
+                        .param("description", "Panne 3"))
+                .andExpect(flash().attribute("messageSucces", containsString("fragile")));
     }
 
     @Test

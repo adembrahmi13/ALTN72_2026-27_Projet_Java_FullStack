@@ -16,6 +16,8 @@
         </a>
     </p>
     <h1>Équipement <span th:text="${equipement.referenceUnique}">Référence</span></h1>
+    <p class="message-info" th:if="${messageSucces}" th:text="${messageSucces}" role="status"></p>
+    <p th:if="${fragile}"><span class="statut-incident niveau-ROUGE">Équipement fragile</span></p>
 
     <dl>
         <dt>Libellé</dt>
