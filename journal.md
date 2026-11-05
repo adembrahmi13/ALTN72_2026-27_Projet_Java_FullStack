@@ -574,6 +574,33 @@ restent également à effectuer.
 2. Injecter une horloge rend les calculs de durée et les tests reproductibles.
 3. Centraliser CSS et fragments HTML assure la cohérence visuelle ; les droits restent contrôlés côté serveur.
 
+## Évolution séance finale
+
+### Description
+
+Évolution « Équipement fragile » : un équipement est fragile s'il a eu au moins 3 incidents ouverts durant les 30 derniers jours, quel que soit leur statut.
+
+- **Règle :** `EquipementService.estFragile(equipementId)`, avec les constantes `SEUIL_FRAGILE` et `FENETRE_FRAGILE_JOURS` (EF5).
+- **Comptage :** `IncidentRepository.countByEquipement_IdAndDateHeureOuvertureGreaterThanEqual` (EF1, borne incluse).
+- **Fiche équipement :** `EquipementController` passe `fragile` à `ficheEquipement.html`, qui affiche le badge « Équipement fragile ».
+- **Tableau de bord :** `IncidentActif` porte un booléen `equipementFragile` rempli par `TableauDeBordService` ; `tableauDeBord.html` affiche le badge à côté de la référence.
+- **Déclaration :** `IncidentController.declarerIncident` ajoute « Attention : cet équipement est désormais fragile. » au message de confirmation affiché sur la fiche équipement.
+
+### Choix de conception et raccourci
+
+- La règle vit uniquement dans le service (EF6) ; contrôleurs et vues ne font que lire le booléen.
+- Rien n'est stocké en base : la fenêtre glissante est recalculée à chaque consultation à partir de l'horloge injectée (EF4), ce qui rend les cas limites testables à la minute près.
+- Le comptage est fait par une requête dérivée Spring Data (`count`), sans charger les incidents en mémoire.
+- **Raccourci :** sur le tableau de bord, une requête de comptage est lancée par ligne d'incident actif. Suffisant pour le volume du projet ; à regrouper en une seule requête (`GROUP BY` équipement) si le tableau devient long.
+
+### Tests ajoutés et limites connues
+
+- `EquipementFragileTest` (7 tests) : les 7 cas limites de l'énoncé (2 incidents, 3 incidents, 3 dont 1 résolu, 30 j 1 min, 29 j 23 h 59, 2 récents + 5 vieux de 45 jours, équipement voisin).
+- `FicheEquipementTest` : badge affiché sur un équipement fragile, absent sinon.
+- `TableauDeBordTest` : badge sur les incidents de l'équipement fragile, pas sur ceux du voisin.
+- `DeclarationIncidentTest` : le message de confirmation contient « fragile » au 3e incident, pas aux deux premiers.
+- **Limites :** affichage vérifié par les tests MockMvc, pas dans un navigateur ; seuil et fenêtre sont des constantes, pas une configuration modifiable sans recompiler ; l'API REST n'expose pas l'information.
+
 ## Suivi interne
 
 | Fonctionnalité                        | État                                                                                                                              |
