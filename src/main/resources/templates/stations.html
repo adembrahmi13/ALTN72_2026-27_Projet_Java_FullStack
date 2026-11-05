@@ -9,13 +9,17 @@
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main id="contenu">
     <p class="surtitre">Le réseau</p>
     <h1>Stations du réseau</h1>
     <p class="introduction">Sélectionnez une station pour retrouver ses équipements et suivre leurs incidents.</p>
     <ul class="liste-stations">
         <li th:each="station : ${stations}">
-            <a th:href="@{/stations/{id}/equipements(id=${station.id})}" th:text="${station.nom}">Station</a>
+            <a th:href="@{/stations/{id}/equipements(id=${station.id})}">
+                <span class="station-repere" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16M3 21h18M8 7h2m4 0h2M8 11h2m4 0h2M9 21v-5h6v5"/></svg></span>
+                <span class="station-nom" th:text="${station.nom}">Station</span>
+                <span class="station-action">Voir les équipements <span aria-hidden="true">→</span></span>
+            </a>
         </li>
     </ul>
     <p th:if="${#lists.isEmpty(stations)}">Aucune station enregistrée.</p>

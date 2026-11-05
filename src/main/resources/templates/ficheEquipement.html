@@ -9,7 +9,7 @@
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main id="contenu">
     <p>
         <a th:href="@{/stations/{id}/equipements(id=${equipement.station.id})}">
             ← Équipements de <span th:text="${equipement.station.nom}">la station</span>
@@ -37,14 +37,16 @@
             <th scope="col">Description</th>
             <th scope="col">Statut</th>
             <th scope="col">Résolution</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="incident : ${incidents}">
             <td th:text="${#temporals.format(incident.dateHeureOuverture, 'dd/MM/yyyy HH:mm')}"></td>
             <td><a th:href="@{/incidents/{id}(id=${incident.id})}" th:text="${incident.description}"></a></td>
-            <td th:text="${incident.statut}"></td>
+            <td><span class="statut-incident" th:classappend="${incident.dateHeureResolution != null ? 'statut-resolu' : (incident.prestataireId != null ? 'statut-affecte' : 'statut-attente')}" th:text="${incident.statut}"></span></td>
             <td th:text="${incident.dateHeureResolution} ? ${#temporals.format(incident.dateHeureResolution, 'dd/MM/yyyy HH:mm')} : '—'"></td>
+            <td><a th:href="@{/incidents/{id}(id=${incident.id})}">Voir le détail →</a></td>
         </tr>
         </tbody>
     </table></div>

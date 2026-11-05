@@ -1,20 +1,39 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Accueil</title>
+    <title>Accueil · Guardian</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
-
-<main class="accueil">
-    <p class="surtitre">Votre espace de supervision</p>
-    <h1>Supervision des équipements</h1>
-    <p>Retrouvez les équipements de votre réseau et consultez le détail des incidents pour suivre leur prise en charge.</p>
-    <p><a class="bouton" th:href="@{/stations}">Consulter les équipements par station</a></p>
-    <p><a th:href="@{/swagger-ui.html}">Documentation et test de l'API (Swagger)</a></p>
+<main class="accueil" id="contenu">
+    <div class="titre-page"><div><p class="surtitre">VOTRE ESPACE DE SUPERVISION</p>
+        <h1>Une vision claire.<br>Un réseau mieux suivi.</h1>
+        <p class="introduction">De la première alerte à la résolution, retrouvez vos équipements et accompagnez chaque intervention.</p>
+        <div class="actions-page">
+            <a class="bouton" sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}">Ouvrir le tableau de bord <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a>
+            <a class="bouton" sec:authorize="hasRole('AGENT_SIGNALEMENT')" th:href="@{/stations}">Explorer les stations <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a>
+            <a class="bouton-secondaire" th:href="@{/incidents/historique}">Consulter l'historique</a>
+        </div>
+    </div>
+    <div class="visuel-reseau" aria-hidden="true">
+        <div class="visuel-quadrillage"></div>
+        <svg viewBox="0 0 400 300" fill="none"><path d="M30 210h90l65-110h90l55 90h60 M55 60h80l70 140h110 M120 210v50h150" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <g fill="currentColor"><circle cx="30" cy="210" r="5"/><circle cx="55" cy="60" r="5"/><circle cx="390" cy="190" r="5"/><circle cx="270" cy="260" r="5"/></g>
+            <g fill="#132e38" stroke="currentColor" stroke-width="3"><circle cx="120" cy="210" r="9"/><circle cx="185" cy="100" r="9"/><circle cx="275" cy="100" r="9"/><circle cx="205" cy="200" r="9"/><circle cx="315" cy="200" r="9"/><circle cx="135" cy="60" r="9"/></g>
+        </svg>
+        <div class="etiquette-reseau"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16 M3 21h18 M8 7h2 M14 7h2 M8 11h2 M14 11h2 M9 21v-5h6v5"/></svg><span>Connecter les lieux.<br><strong>Coordonner les actions.</strong></span></div>
+    </div></div>
+    <div class="entete-section"><div><p class="surtitre">À PORTÉE DE MAIN</p><h2>Votre réseau, vos actions</h2></div><span class="texte-discret">Choisissez votre prochaine étape</span></div>
+    <div class="raccourcis">
+        <a class="carte-raccourci" th:href="@{/stations}"><span class="icone-carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16 M3 21h18 M8 7h2 M14 7h2 M8 11h2 M14 11h2 M9 21v-5h6v5"/></svg></span><span class="numero-carte">01</span><h3>Explorer les équipements</h3><p>Retrouvez une station, consultez ses équipements et signalez une panne.</p><span class="lien-carte">Parcourir le réseau <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></span></a>
+        <a class="carte-raccourci" sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}"><span class="icone-carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg></span><span class="numero-carte">02</span><h3>Prioriser les interventions</h3><p>Repérez les incidents actifs, leur ancienneté et leur prise en charge.</p><span class="lien-carte">Voir les incidents actifs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></span></a>
+        <a class="carte-raccourci" th:href="@{/incidents/historique}"><span class="icone-carte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2 7 M3 4v7h7 M12 7v5l3 2"/></svg></span><span class="numero-carte">03</span><h3>Retrouver les résolutions</h3><p>Consultez les incidents clôturés et le détail des interventions passées.</p><span class="lien-carte">Ouvrir l'historique <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></span></a>
+    </div>
+    <section class="bandeau-aide"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16 M3 21h18 M8 7h2 M14 7h2 M8 11h2 M14 11h2 M9 21v-5h6v5"/></svg><div><h2>Une panne à signaler ?</h2><p>Ouvrez la fiche de l'équipement concerné pour déclarer un incident.</p></div></div><a class="bouton-secondaire" th:href="@{/stations}">Trouver un équipement <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a></section>
+    <p class="lien-documentation"><a th:href="@{/swagger-ui.html}">Documentation et test de l'API (Swagger) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a></p>
 </main>
 </body>
 </html>

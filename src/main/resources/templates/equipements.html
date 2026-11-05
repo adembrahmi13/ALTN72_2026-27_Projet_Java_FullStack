@@ -9,7 +9,7 @@
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main id="contenu">
     <p><a th:href="@{/stations}">← Toutes les stations</a></p>
     <h1>Équipements — <span th:text="${station.nom}">Station</span></h1>
 
