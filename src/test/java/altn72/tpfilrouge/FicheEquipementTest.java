@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -62,5 +65,33 @@ class FicheEquipementTest {
         mockMvc.perform(get("/equipements/{id}", Integer.MAX_VALUE))
                 .andExpect(status().isNotFound())
                 .andExpect(view().name("erreur"));
+    }
+
+    // Évolution "Équipement fragile" : badge affiché si et seulement si l'équipement est fragile
+    private Equipement equipementAvecIncidentsRecents(String reference, int nombre) {
+        Station station = stationRepository.save(new Station("Station " + reference));
+        Equipement equipement = equipementRepository.save(new Equipement(reference, "Portique", "Portique", "En panne", station));
+        for (int i = 0; i < nombre; i++) {
+            incidentRepository.save(new Incident(equipement, "Panne " + i, LocalDateTime.now().minusDays(1), "Non affecté", null, null));
+        }
+        return equipement;
+    }
+
+    @Test
+    void badgeFragileAfficheSurEquipementFragile() throws Exception {
+        Equipement equipement = equipementAvecIncidentsRecents("EQ-FRAG", 3);
+
+        mockMvc.perform(get("/equipements/{id}", equipement.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Équipement fragile")));
+    }
+
+    @Test
+    void badgeFragileAbsentSurEquipementNonFragile() throws Exception {
+        Equipement equipement = equipementAvecIncidentsRecents("EQ-SOLIDE", 2);
+
+        mockMvc.perform(get("/equipements/{id}", equipement.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(not(containsString("Équipement fragile"))));
     }
 }
