@@ -3,31 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Connexion</title>
+    <title>Connexion · Guardian</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body class="page-connexion">
-<main class="carte-connexion">
-    <p class="surtitre">Guardian · Supervision du réseau</p>
-    <h1>Connexion</h1>
-    <p class="introduction">Retrouvez votre espace de suivi des équipements.</p>
-
-    <p th:if="${param.erreur}" class="message-erreur">
-        Identifiant ou mot de passe incorrect.
-    </p>
-    <p th:if="${param.deconnexion}" class="message-info">
-        Vous avez bien été déconnecté.
-    </p>
-
-    <form th:action="@{/connexion}" method="post">
-        <label for="login">Identifiant</label>
-        <input type="text" id="login" name="login" autocomplete="username" required autofocus>
-
-        <label for="motDePasse">Mot de passe</label>
-        <input type="password" id="motDePasse" name="motDePasse" autocomplete="current-password" required>
-
-        <button type="submit">Se connecter</button>
-    </form>
-</main>
+    <section class="presentation-connexion" aria-label="Guardian, supervision du réseau">
+        <a class="marque" th:href="@{/connexion}"><span class="marque-symbole" aria-hidden="true">G<span></span></span><span>guardian<span class="marque-sous-titre">SUPERVISION DU RÉSEAU</span></span></a>
+        <div><p class="surtitre">CHAQUE INTERVENTION COMMENCE ICI</p><h2>Le bon regard.<br>Au bon endroit.</h2>
+        <p>Des équipements suivis, des pannes signalées et des équipes qui avancent ensemble.</p>
+        <div class="parcours-connexion"><span>01 <strong>Repérer</strong></span><span>02 <strong>Intervenir</strong></span><span>03 <strong>Résoudre</strong></span></div></div>
+        <span class="signature-connexion">Guardian · Votre réseau, en perspective.</span>
+        <svg class="motif-connexion" viewBox="0 0 500 300" fill="none" aria-hidden="true"><path d="M-20 180h130l70-110h120l90 150h130 M50 320v-60l190-100h200 M-20 60h80l80 120" stroke="currentColor" stroke-width="2"/><g fill="currentColor"><circle cx="110" cy="180" r="7"/><circle cx="180" cy="70" r="7"/><circle cx="300" cy="70" r="7"/><circle cx="240" cy="160" r="7"/></g></svg>
+    </section>
+    <main class="carte-connexion" id="contenu">
+        <span class="repere-connexion">ESPACE ÉQUIPE</span>
+        <h1>Bienvenue.</h1>
+        <p class="introduction">Connectez-vous pour retrouver votre réseau.</p>
+        <p th:if="${param.erreur}" class="message-erreur" role="alert">Identifiant ou mot de passe incorrect.</p>
+        <p th:if="${param.deconnexion}" class="message-info" role="status">Vous avez bien été déconnecté.</p>
+        <form th:action="@{/connexion}" method="post">
+            <label for="login">Identifiant</label>
+            <input type="text" id="login" name="login" autocomplete="username" placeholder="Votre identifiant" required autofocus>
+            <label for="motDePasse">Mot de passe</label>
+            <input type="password" id="motDePasse" name="motDePasse" autocomplete="current-password" placeholder="Votre mot de passe" required>
+            <button type="submit">Se connecter <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></button>
+        </form>
+        <p class="aide-connexion">Utilisez les identifiants de votre équipe.<br>Un problème d'accès ? Contactez votre responsable.</p>
+    </main>
 </body>
 </html>

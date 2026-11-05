@@ -1,27 +1,46 @@
 <!DOCTYPE html>
-<html lang="fr"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-<header th:fragment="entete" sec:authorize="isAuthenticated()" class="entete-utilisateur">
-    <a class="marque" th:href="@{/accueil}" aria-label="Guardian, accueil"><span class="marque-symbole" aria-hidden="true">G</span> Guardian</a>
-    <nav aria-label="Navigation principale">
-        <a th:href="@{/accueil}">Accueil</a>
-        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}">Tableau de bord</a>
-        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/statistiques}">Statistiques</a>
-        <a th:href="@{/stations}">Stations et équipements</a>
-        <a th:href="@{/incidents/historique}">Historique des incidents</a>
-        <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/donnees/import}">Importer des données</a>
-    </nav>
-    <div class="compte-utilisateur">
-    <span class="identite-utilisateur">
-        Bonjour <span th:text="${#authentication.principal.prenom}">Prénom</span>
-        (<span th:text="${#authentication.principal.profil.libelle}">Profil</span>)
-    </span>
-    <form th:action="@{/deconnexion}" method="post" class="formulaire-deconnexion">
-        <button type="submit" class="lien">Déconnectez-vous</button>
-    </form>
-    </div>
-</header>
+<div th:fragment="entete" sec:authorize="isAuthenticated()" class="cadre-application">
+    <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+    <aside class="barre-laterale" id="navigation-laterale">
+        <a class="marque" th:href="@{/accueil}" aria-label="Guardian, accueil">
+            <span class="marque-symbole" aria-hidden="true">G<span></span></span>
+            <span>guardian<span class="marque-sous-titre">SUPERVISION DU RÉSEAU</span></span>
+        </a>
+        <p class="rubrique-navigation">ESPACE DE TRAVAIL</p>
+        <nav aria-label="Navigation principale">
+            <a th:href="@{/accueil}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/></svg><span>Accueil</span></a>
+            <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/tableau-de-bord}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z"/></svg><span>Tableau de bord</span></a>
+            <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/statistiques}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v17h17 M8 15v-4 M13 15V6 M18 15V9"/></svg><span>Statistiques</span></a>
+            <a th:href="@{/stations}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16 M3 21h18 M8 7h2 M14 7h2 M8 11h2 M14 11h2 M9 21v-5h6v5"/></svg><span>Stations et équipements</span></a>
+            <a th:href="@{/incidents/historique}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2 7 M3 4v7h7 M12 7v5l3 2"/></svg><span>Historique des incidents</span></a>
+            <a sec:authorize="hasRole('RESPONSABLE_EXPLOITATION')" th:href="@{/donnees/import}" data-navigation><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12 M7 10l5 5 5-5 M4 15v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/></svg><span>Importer des données</span></a>
+        </nav>
+        <div class="pied-navigation">
+            <span class="point-reseau" aria-hidden="true"></span>
+            <div><strong>Chaque signalement compte.</strong><p>Un réseau suivi, des interventions coordonnées.</p></div>
+        </div>
+    </aside>
+    <button class="voile-navigation" type="button" aria-label="Fermer la navigation" tabindex="-1"></button>
+    <header class="entete-utilisateur">
+        <div class="contexte-page">
+            <button type="button" class="bouton-menu" aria-label="Ouvrir la navigation" aria-expanded="false" aria-controls="navigation-laterale">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <span class="contexte-produit">Guardian <span>/</span> <strong data-titre-page>Espace de travail</strong></span>
+        </div>
+        <div class="compte-utilisateur">
+            <span class="avatar-utilisateur" aria-hidden="true" th:text="${#strings.substring(#authentication.principal.prenom, 0, 1)}">C</span>
+            <span class="identite-utilisateur">Bonjour <strong th:text="${#authentication.principal.prenom}">Prénom</strong>
+                <small th:text="${#authentication.principal.profil.libelle}">Profil</small>
+            </span>
+            <form th:action="@{/deconnexion}" method="post" class="formulaire-deconnexion">
+                <button type="submit" class="lien" aria-label="Déconnectez-vous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H4v16h5 M9 12h12 M16 7l5 5-5 5"/></svg><span>Déconnectez-vous</span></button>
+            </form>
+        </div>
+    </header>
+    <script th:src="@{/js/interface.js}" defer></script>
+</div>
 </body>
 </html>

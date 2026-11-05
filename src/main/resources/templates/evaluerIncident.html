@@ -8,7 +8,7 @@
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
-<main>
+<main id="contenu">
     <p><a th:href="@{/incidents/{id}(id=${incident.id})}">← Détail de l'incident</a></p>
     <h1>Évaluer l'intervention sur l'incident n° <span th:text="${incident.id}"></span></h1>
     <p>Prestataire : <strong th:text="${incident.prestataire.nom}"></strong></p>

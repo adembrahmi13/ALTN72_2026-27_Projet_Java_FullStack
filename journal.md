@@ -2,7 +2,7 @@
 
 **Groupe :** Adem BRAHMI, Kais DILMI
 
-**Mise à jour :** 4 novembre 2026
+**Mise à jour :** 5 novembre 2026
 
 **Date limite Moodle :** 5 novembre 2026 à 23 h 59.
 
@@ -126,7 +126,7 @@ encore ajoutée. L'interface utilise du CSS local et des polices système.
 - **Configuration :** `src/test/resources/application.properties`, schéma JPA `create-drop`, script MariaDB désactivé.
 - **Isolation :** transactions et retour arrière pour les tests de données.
 - **Commande :** `mvn verify`.
-- **Dernière validation :** `mvn verify` réussi ; 45 tests du socle, 11 tests d'import CSV et 5 tests d'export PDF, soit 61 tests sans échec ni erreur.
+- **Dernière validation après refonte front :** `mvn verify` réussi, 99 tests sans échec ni erreur.
 - **Horloge :** `Clock` injectable ; horloge fixe UTC pour les durées F5.
 - **Couverture chiffrée :** non mesurée, aucun rapport JaCoCo configuré.
 
@@ -166,7 +166,7 @@ et les durées exactes en jours, heures et minutes.
 | API incidents et agrégations graphiques                              | Fonctionnalités absentes                                                                            |
 | Import/export sur MariaDB et limites HTTP multipart réelles          | Tests MockMvc/H2 ; limites du service testées, dépassement HTTP traité mais sans test serveur dédié |
 | Script SQL MariaDB                                                   | Tests sur H2 uniquement                                                                             |
-| Aspect visuel et comportement mobile réels                           | Pas de test navigateur ni de capture visuelle effectués                                             |
+| Navigateurs autres que Chromium et accessibilité exhaustive | Contrôle Chromium desktop/mobile effectué ; Safari/Firefox et audit complet restants |
 
 ## CHOIX TECHNIQUES
 
@@ -419,24 +419,35 @@ dans une transaction de service pour respecter RG10.
 
 ### Interface et CSS commun
 
-Toutes les pages HTML utilisent `static/css/style.css`, y compris les anciennes
-pages programmeurs auparavant liées au CDN Bootstrap.
+Refonte du front le 5 novembre : toutes les pages partagent `static/css/style.css`
+et le fragment `fragments/entete.html`, sans framework front supplémentaire.
 
-- Variables CSS partagées : vert profond `#126b65`, texte bleu ardoise `#1c3046`, fond clair `#f3f6fa`, surfaces blanches.
-- En-tête Guardian avec liens Accueil, Stations et équipements, et Historique des incidents.
-- Cartes arrondies, ombres légères, espacements et titres harmonisés.
-- Boutons, champs, formulaires et messages d'erreur/information cohérents.
-- Stations en cartes ; fiches structurées en listes de description.
-- Tableaux dans des conteneurs avec défilement horizontal sur petit écran.
-- Présentation dédiée pour connexion et erreur avec la même palette.
-- Métadonnée viewport sur chaque page et styles mobiles sous 760 px.
-- Focus clavier visible, libellés conservés, régions de tableaux accessibles au clavier.
-- Respect de `prefers-reduced-motion` et polices système sans chargement externe.
+- Identité visuelle : navigation bleu profond `#142c35`, vert `#137766`, accent menthe et surfaces blanches sur fond gris clair.
+- Navigation latérale persistante sur ordinateur, page active indiquée, en-tête avec identité et déconnexion regroupées.
+- Menu mobile sous 1 000 px : bouton avec état `aria-expanded`, voile de fermeture, Échap, déplacement et maintien du focus clavier dans les liens du menu.
+- Accueil avec raccourcis adaptés au profil et illustration de réseau en SVG ; aucune statistique fictive affichée.
+- Connexion en deux panneaux sur ordinateur et formulaire compact sur mobile, champs avec autocomplétion et messages conservés.
+- Tableau de bord : compteurs en cartes, filtres alignés, niveaux d'attention identifiés par texte et couleur.
+- Stations en cartes avec accès explicite aux équipements ; fiches avec statuts visuels et lien « Voir le détail » pour chaque incident.
+- Affectation mise en évidence dans un panneau ; action de résolution placée après les informations pour encourager leur consultation avant clôture.
+- Statistiques organisées en panneaux, boutons, formulaires et messages cohérents sur toutes les pages.
+- Recherche locale dans les tableaux via `static/js/interface.js` : plusieurs mots, insensible à la casse et aux accents, compteur de résultats et état vide. Elle porte sur les lignes déjà affichées après les éventuels filtres serveur.
+- Tableaux défilants sur mobile, lien d'évitement vers le contenu, focus visible, icônes décoratives masquées aux lecteurs d'écran, respect de `prefers-reduced-motion` et styles d'impression.
+- Polices système, SVG et scripts locaux : aucun CDN requis pour cette interface.
+
+Les règles métier, routes, champs de formulaires et contrôles serveur des profils
+sont conservés. Les fonctionnalités sans JavaScript restent disponibles ; le menu
+mobile et la recherche dans les tableaux nécessitent JavaScript.
 
 La couleur d'erreur ne représente pas une urgence d'incident.
 Les seuils 48 h / 72 h sont les constantes `SEUIL_ORANGE_HEURES` et `SEUIL_ROUGE_HEURES` de `TableauDeBordService`, seul endroit où elles sont définies. Le niveau d'attention (`NiveauAttention`) est recalculé à chaque affichage avec l'heure courante, jamais enregistré en base.
-Les tests valident les templates et parcours couverts ; la vérification visuelle
-dans un navigateur reste à effectuer.
+Validation : 99 tests Maven réussis. Contrôle Chromium via Playwright sur une base
+H2 de démonstration isolée : 10 pages sur ordinateur (1 440 px), 6 pages sur mobile
+(390 px), connexion/déconnexion et accueil agent, menu mobile/Échap et recherche
+sans accents. Captures et script de contrôle local dans `target/ui-captures` et
+`target/ui-verification.cjs` (non versionnés). Aucun débordement horizontal global
+ni erreur JavaScript détecté sur ces parcours. Vérification Safari/Firefox et
+validation exhaustive d'accessibilité restantes.
 
 ## LOT ALPHA
 
@@ -581,7 +592,7 @@ restent également à effectuer.
 | F12 API incidents + Swagger           | Non réalisée                                                                                                                      |
 | Lot alpha 1 : import / export         | Réalisé ; CSV stations/équipements et PDF historique, responsable uniquement, 16 tests dédiés                                     |
 | Lot alpha 2 : graphiques              | Non réalisé                                                                                                                       |
-| Harmonisation CSS de toutes les pages | Réalisée ; vérification visuelle navigateur restante                                                                              |
+| Harmonisation CSS de toutes les pages | Refonte réalisée ; parcours Chromium desktop/mobile et recherche vérifiés |
 | Déploiement                           | Réalisé sur Railway : https://guardian-efrei.up.railway.app                                                                       |
 
 ### Vérifications avant dépôt

@@ -9,7 +9,7 @@
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
 
-<main>
+<main id="contenu">
     <p><a th:href="@{/equipements/{id}(id=${equipement.id})}">← Fiche de l'équipement</a></p>
     <h1>Déclarer un incident — <span th:text="${equipement.referenceUnique}">Référence</span></h1>
     <p th:text="${equipement.libelleDescription} + ' (' + ${equipement.station.nom} + ')'"></p>

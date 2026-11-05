@@ -8,7 +8,7 @@
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
-<main>
+<main id="contenu">
     <p><a th:href="@{/equipements/{id}(id=${incident.equipement.id})}">← Fiche de l'équipement</a></p>
     <h1>Incident n° <span th:text="${incident.id}"></span></h1>
     <p class="message-info" th:if="${messageSucces}" th:text="${messageSucces}" role="status"></p>
@@ -16,10 +16,7 @@
         <a class="bouton" th:href="@{/incidents/{id}/modifier(id=${incident.id})}">Modifier l'incident</a>
     </p>
     <p class="message-info" th:unless="${modificationAutorisee}">Cet incident est en lecture seule.</p>
-    <form th:if="${resolutionAutorisee}" th:action="@{/incidents/{id}/resoudre(id=${incident.id})}" method="post">
-        <p>La résolution clôture l'incident et conserve son historique. Il ne pourra plus être modifié.</p>
-        <button type="submit">Déclarer l'incident comme résolu</button>
-    </form>
+
     <dl>
         <dt>Description</dt>
         <dd th:text="${incident.description}"></dd>
@@ -43,7 +40,7 @@
         <dt>Nom</dt><dd th:text="${incident.prestataire.nom}"></dd>
         <dt>Contact</dt><dd th:text="${incident.prestataire.contact}"></dd>
     </dl>
-    <section th:if="${affectationAutorisee}">
+    <section class="panneau-affectation" th:if="${affectationAutorisee}">
         <h3 th:text="${incident.prestataireId == null ? 'Affecter un prestataire' : 'Réaffecter un prestataire'}"></h3>
         <form th:action="@{/incidents/{id}/affecter-prestataire(id=${incident.id})}" method="post">
             <label for="prestataireId">Choisir un prestataire :</label>
@@ -66,6 +63,10 @@
         <dd th:text="${#strings.isEmpty(detail.evaluation.commentaire) ? 'Aucun commentaire.' : detail.evaluation.commentaire}"></dd>
         <dt>Date</dt><dd th:text="${#temporals.format(detail.evaluation.date, 'dd/MM/yyyy')}"></dd>
     </dl>
+    <form class="zone-resolution" th:if="${resolutionAutorisee}" th:action="@{/incidents/{id}/resoudre(id=${incident.id})}" method="post">
+        <p>La résolution clôture l'incident et conserve son historique. Il ne pourra plus être modifié.</p>
+        <button type="submit">Déclarer l'incident comme résolu</button>
+    </form>
 </main>
 </body>
 </html>

@@ -8,12 +8,16 @@
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
-<main>
+<main id="contenu">
     <p class="surtitre">Visualisation des données</p>
     <h1>Statistiques</h1>
+    <p class="introduction">Prenez du recul sur les interventions et identifiez les équipements qui concentrent les signalements.</p>
+    <div class="grille-statistiques">
+    <section class="carte-statistique">
 
     <!-- Graphique 1 : la largeur de la barre = note moyenne / 5 -->
     <h2>Note moyenne des prestataires</h2>
+    <p>Les évaluations des interventions, sur une échelle de 1 à 5.</p>
     <p th:if="${#lists.isEmpty(notesMoyennes)}" class="message-info">Aucun prestataire n'a encore été évalué.</p>
     <ul class="graphique" th:unless="${#lists.isEmpty(notesMoyennes)}">
         <li th:each="ligne : ${notesMoyennes}">
@@ -23,8 +27,10 @@
         </li>
     </ul>
 
-    <!-- Graphique 2 : la liste est triée du plus grand au plus petit, la première barre sert donc de référence (100 %) -->
+    </section>
+    <section class="carte-statistique">
     <h2>Incidents par type d'équipement</h2>
+    <p>La répartition des incidents déclarés sur le réseau.</p>
     <p th:if="${#lists.isEmpty(incidentsParType)}" class="message-info">Aucun incident déclaré pour le moment.</p>
     <ul class="graphique" th:unless="${#lists.isEmpty(incidentsParType)}">
         <li th:each="ligne : ${incidentsParType}">
@@ -33,6 +39,8 @@
             <span th:text="${ligne.nombre + ' incident(s)'}"></span>
         </li>
     </ul>
+    </section>
+    </div>
 </main>
 </body>
 </html>

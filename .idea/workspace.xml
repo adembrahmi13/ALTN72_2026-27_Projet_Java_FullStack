@@ -5,13 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5d4d2069-84fe-43dc-9f5f-c7b177d8855a" name="Changes" comment="Dev Full Stack Java - 2026-27&#10;Corrigé TP 3-4">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/data_sources_history.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/journal.md" beforeDir="false" afterPath="$PROJECT_DIR$/journal.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/configuration/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/altn72/tpfilrouge/repository/IncidentRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/accueil.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/connexion.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/connexion.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/detailIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/detailIncident.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/equipements.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/equipements.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/erreur.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/erreur.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/evaluerIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/evaluerIncident.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/ficheEquipement.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/ficheEquipement.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/fragments/entete.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/historiqueIncidents.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/historiqueIncidents.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/importDonnees.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/importDonnees.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/modifierIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/modifierIncident.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/nouvelIncident.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/nouvelIncident.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/stations.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/stations.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/statistiques.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/statistiques.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/tableauDeBord.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/tableauDeBord.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,6 +40,7 @@
   <component name="DatabaseLocalColorSettings">
     <colors>
       <entry key="23a49601-4d8f-4857-8251-e6b25e3001b3" value="" />
+      <entry key="8fb8f2ce-658e-4f00-b470-e17bddf0a322" value="" />
     </colors>
   </component>
   <component name="EmbeddingIndexingInfo">
@@ -44,8 +59,8 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="feat/Consulter_l’historique_des_incidents_résolus" />
-        <entry key="$PROJECT_DIR$" value="develop" />
+        <entry key="$PROJECT_DIR$" value="feat/expose_api_rest" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -84,23 +99,23 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.3724409386833467" />
-      <entry key="MS500" value="3.3239355057488282" />
-      <entry key="S2" value="6.547333659977597" />
-      <entry key="S5" value="8.553870295894377" />
-      <entry key="S10" value="13.499515404176265" />
-      <entry key="S30" value="29.917838915126268" />
-      <entry key="S60" value="43.48605764013578" />
-      <entry key="M2" value="71.54341740176147" />
-      <entry key="M5" value="175.8113926992945" />
-      <entry key="M10" value="322.84191134630333" />
-      <entry key="M15" value="451.2788390838448" />
-      <entry key="M30" value="784.808329761375" />
-      <entry key="H1" value="1249.1022753201937" />
-      <entry key="H2" value="1728.4308695695452" />
-      <entry key="H4" value="2104.715827867417" />
-      <entry key="D1" value="2536.2967684518308" />
-      <entry key="W1" value="2624.7720743943696" />
+      <entry key="MS100" value="1.6471017883416517" />
+      <entry key="MS500" value="4.787756615522616" />
+      <entry key="S2" value="11.419727291713281" />
+      <entry key="S5" value="15.836508656068103" />
+      <entry key="S10" value="24.534858466923193" />
+      <entry key="S30" value="59.96843079213835" />
+      <entry key="S60" value="85.02544197696504" />
+      <entry key="M2" value="103.3381136816587" />
+      <entry key="M5" value="125.4302322122638" />
+      <entry key="M10" value="180.47573002607288" />
+      <entry key="M15" value="261.0325817933183" />
+      <entry key="M30" value="570.3626347881193" />
+      <entry key="H1" value="1171.7965841281846" />
+      <entry key="H2" value="1954.7769691750204" />
+      <entry key="H4" value="2665.416184433941" />
+      <entry key="D1" value="3570.4314919419467" />
+      <entry key="W1" value="3766.839358448876" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
@@ -122,23 +137,23 @@
       <entry key="W1" value="0.0" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.3074478559339031" />
-      <entry key="MS500" value="3.2918765159484025" />
-      <entry key="S2" value="6.531316419973015" />
-      <entry key="S5" value="8.545492660594427" />
-      <entry key="S10" value="13.493013543824077" />
-      <entry key="S30" value="29.9131433193469" />
-      <entry key="S60" value="43.48263679344251" />
-      <entry key="M2" value="71.54051095317674" />
-      <entry key="M5" value="175.8082386879719" />
-      <entry key="M10" value="322.838735528728" />
-      <entry key="M15" value="451.27565136084075" />
-      <entry key="M30" value="784.8051187337392" />
-      <entry key="H1" value="1249.099401947738" />
-      <entry key="H2" value="1728.4287357731234" />
-      <entry key="H4" value="2104.7144772913434" />
-      <entry key="D1" value="2536.2964876794176" />
-      <entry key="W1" value="2624.7720326292656" />
+      <entry key="MS100" value="1.5247753804173918" />
+      <entry key="MS500" value="4.723100893920356" />
+      <entry key="S2" value="11.383154693860437" />
+      <entry key="S5" value="15.816602221786043" />
+      <entry key="S10" value="24.51996039168512" />
+      <entry key="S30" value="59.95696093889996" />
+      <entry key="S60" value="85.01744573733386" />
+      <entry key="M2" value="103.33329419670812" />
+      <entry key="M5" value="125.42787922162644" />
+      <entry key="M10" value="180.47392443969494" />
+      <entry key="M15" value="261.03072005301686" />
+      <entry key="M30" value="570.3603927270534" />
+      <entry key="H1" value="1171.7940842316" />
+      <entry key="H2" value="1954.7747421955883" />
+      <entry key="H4" value="2665.414601390521" />
+      <entry key="D1" value="3570.431124180652" />
+      <entry key="W1" value="3766.839302616728" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -190,7 +205,7 @@
     "Spring Boot.TpFilRougeApplication.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "copilot.chat.legacySessionMetadata.migrated": "true",
-    "git-widget-placeholder": "feat/expose__api__rest",
+    "git-widget-placeholder": "refactor/refacotr__front",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "P:/MES COURS/Developpement Full Stack avec Java/ALTN72 - 2026_2027/DEV_CODE/GitHub/TpFilRouge_CORRIGE_5",
@@ -208,8 +223,8 @@
   },
   "keyToStringList": {
     "DatabaseDriversLRU": [
-      "mysql",
-      "mariadb"
+      "mariadb",
+      "mysql"
     ]
   }
 }]]></component>
@@ -305,7 +320,8 @@
       <workItem from="1793357510840" duration="2526000" />
       <workItem from="1793366506661" duration="7950000" />
       <workItem from="1793732769815" duration="5148000" />
-      <workItem from="1793813999637" duration="4581000" />
+      <workItem from="1793813999637" duration="5760000" />
+      <workItem from="1793868509247" duration="4550000" />
     </task>
     <servers />
   </component>

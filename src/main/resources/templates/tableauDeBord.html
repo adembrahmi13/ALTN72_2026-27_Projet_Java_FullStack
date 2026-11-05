@@ -8,9 +8,10 @@
 </head>
 <body>
 <div th:replace="~{fragments/entete :: entete}"></div>
-<main>
+<main id="contenu" class="page-tableau-de-bord">
     <p class="surtitre">Supervision</p>
     <h1>Tableau de bord des incidents actifs</h1>
+    <p class="introduction">Repérez les priorités, retrouvez une station et ouvrez un incident pour coordonner son intervention.</p>
 
     <!-- Indicateurs synthétiques -->
     <ul class="compteurs">
@@ -20,26 +21,30 @@
         </li>
     </ul>
 
-    <p th:unless="${#lists.isEmpty(incidentsParStation)}">Incidents actifs par station :
+    <p class="synthese-stations" th:unless="${#lists.isEmpty(incidentsParStation)}">Incidents actifs par station :
         <span th:each="ligne, etat : ${incidentsParStation}">
             <strong th:text="${ligne.nom}"></strong> <span th:text="${ligne.nombre}"></span><span th:unless="${etat.last}"> · </span>
         </span>
     </p>
 
     <!-- Filtres : station et niveau d'attention -->
-    <form th:action="@{/tableau-de-bord}" method="get">
+    <form class="filtres" th:action="@{/tableau-de-bord}" method="get">
+        <div>
         <label for="stationId">Station</label>
         <select id="stationId" name="stationId">
             <option value="">Toutes les stations</option>
             <option th:each="station : ${stations}" th:value="${station.id}" th:text="${station.nom}"
                     th:selected="${station.id == stationChoisie}"></option>
         </select>
+        </div>
+        <div>
         <label for="niveau">Niveau d'attention</label>
         <select id="niveau" name="niveau">
             <option value="">Tous les niveaux</option>
             <option th:each="niveau : ${niveaux}" th:value="${niveau.name()}" th:text="${niveau.libelle}"
                     th:selected="${niveau == niveauChoisi}"></option>
         </select>
+        </div>
         <button type="submit">Filtrer</button>
         <a class="bouton-secondaire" th:href="@{/tableau-de-bord}">Réinitialiser</a>
     </form>
