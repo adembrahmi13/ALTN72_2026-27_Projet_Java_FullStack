@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -23,6 +24,9 @@ public interface IncidentRepository extends JpaRepository<Incident, Integer> {
 
     // RG7 : les incidents d'un équipement sont ordonnés selon la date d'ouverture (le plus récent en premier)
     List<Incident> findByEquipement_IdOrderByDateHeureOuvertureDesc(Integer equipementId);
+
+    // EF1/EF2 : incidents d'un équipement ouverts depuis une date, tous statuts confondus
+    long countByEquipement_IdAndDateHeureOuvertureGreaterThanEqual(Integer equipementId, LocalDateTime depuis);
 
     // RG6 : incidents actifs (non résolus) pour le tableau de bord, le plus ancien en premier
     @EntityGraph(attributePaths = {"equipement", "equipement.station", "prestataire"})
