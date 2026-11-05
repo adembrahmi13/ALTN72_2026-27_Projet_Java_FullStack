@@ -25,11 +25,14 @@ public class TableauDeBordService {
 
     private final IncidentRepository incidentRepository;
     private final IncidentService incidentService;
+    private final EquipementService equipementService;
     private final Clock horloge;
 
-    public TableauDeBordService(IncidentRepository incidentRepository, IncidentService incidentService, Clock horloge) {
+    public TableauDeBordService(IncidentRepository incidentRepository, IncidentService incidentService,
+                                EquipementService equipementService, Clock horloge) {
         this.incidentRepository = incidentRepository;
         this.incidentService = incidentService;
+        this.equipementService = equipementService;
         this.horloge = horloge;
     }
 
@@ -61,7 +64,9 @@ public class TableauDeBordService {
             boolean bonneStation = stationId == null || incident.getEquipement().getStation().getId().equals(stationId);
             boolean bonNiveau = niveau == null || niveauIncident == niveau;
             if (bonneStation && bonNiveau) {
-                incidentsActifs.add(new IncidentActif(incident, niveauIncident, incidentService.calculerDureeOuverture(incident)));
+                // shortcut: une requête de comptage par ligne, à regrouper en une seule requête si le tableau devient très long
+                incidentsActifs.add(new IncidentActif(incident, niveauIncident, incidentService.calculerDureeOuverture(incident),
+                        equipementService.estFragile(incident.getEquipement().getId())));
             }
         }
         return incidentsActifs;

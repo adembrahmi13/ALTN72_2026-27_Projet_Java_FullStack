@@ -146,6 +146,24 @@ class TableauDeBordTest {
         assertEquals(2L, nombre);
     }
 
+    // Évolution "Équipement fragile" : badge sur les incidents actifs dont l'équipement est fragile, pas sur le voisin
+    @Test
+    void badgeFragileSurLesIncidentsDeLEquipementFragile() throws Exception {
+        incidentOuvertDepuis(60);
+        incidentOuvertDepuis(120);
+        incidentOuvertDepuis(180);
+        Equipement voisin = equipements.save(new Equipement("EQ-F12", "Portique F12", "Portique", "En panne", station));
+        Incident incidentVoisin = incidents.save(new Incident(voisin, "Panne voisin", MAINTENANT.minusHours(1),
+                Incident.STATUT_NON_AFFECTE, null, null));
+
+        for (IncidentActif ligne : service.listerIncidentsActifs(station.getId(), null)) {
+            assertEquals(!ligne.incident().getId().equals(incidentVoisin.getId()), ligne.equipementFragile());
+        }
+        mvc.perform(get("/tableau-de-bord").param("stationId", station.getId().toString()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Équipement fragile")));
+    }
+
     @Test
     void niveauInvalideDansLAdresseAfficheUnMessageClair() throws Exception {
         mvc.perform(get("/tableau-de-bord").param("niveau", "VIOLET"))
