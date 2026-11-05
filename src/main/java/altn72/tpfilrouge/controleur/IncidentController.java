@@ -111,12 +111,17 @@ public class IncidentController {
     @PostMapping("/equipements/{equipementId}/incidents")
     public String declarerIncident(@PathVariable Integer equipementId,
                                    @Valid @ModelAttribute("nouvelIncident") Incident nouvelIncident,
-                                   BindingResult erreurs, Model model) {
+                                   BindingResult erreurs, Model model, RedirectAttributes redirection) {
         if (erreurs.hasErrors()) {
             model.addAttribute("equipement", equipementService.trouverEquipement(equipementId));
             return VUE_NOUVEL_INCIDENT;
         }
         incidentService.declarerIncident(equipementId, nouvelIncident.getDescription());
+        String message = "L'incident a été déclaré.";
+        if (equipementService.estFragile(equipementId)) {
+            message += " Attention : cet équipement est désormais fragile.";
+        }
+        redirection.addFlashAttribute("messageSucces", message);
         return "redirect:/equipements/" + equipementId;
     }
 }
